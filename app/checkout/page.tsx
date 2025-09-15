@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { useCart } from '@/contexts/CartContext'
 import CheckoutForm from '@/components/CheckoutForm'
@@ -11,10 +11,50 @@ export default function CheckoutPage() {
   const { items, total, clearCart } = useCart()
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
+  const [isClientMounted, setIsClientMounted] = useState(false)
 
+  // Ensure component is mounted on client before checking cart
+  useEffect(() => {
+    setIsClientMounted(true)
+  }, [])
+
+  // Handle empty cart redirect after client mount
+  useEffect(() => {
+    if (isClientMounted && items.length === 0) {
+      router.push('/cart')
+    }
+  }, [isClientMounted, items.length, router])
+
+  // Show loading during SSR and before client mount
+  if (!isClientMounted) {
+    return (
+      <div className="min-h-screen bg-secondary-50 section-padding">
+        <div className="container-max">
+          <div className="flex items-center justify-center py-16">
+            <div className="text-center">
+              <div className="w-8 h-8 border-2 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-secondary-600">Loading checkout...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // Show loading if cart is empty and we're about to redirect
   if (items.length === 0) {
-    router.push('/cart')
-    return null
+    return (
+      <div className="min-h-screen bg-secondary-50 section-padding">
+        <div className="container-max">
+          <div className="flex items-center justify-center py-16">
+            <div className="text-center">
+              <div className="w-8 h-8 border-2 border-primary-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+              <p className="text-secondary-600">Redirecting to cart...</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   const handleCheckout = async (formData: CheckoutFormData) => {

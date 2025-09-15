@@ -7,18 +7,24 @@ import ContactSection from '@/components/ContactSection'
 import { getCategories, getFeaturedProducts, getCertifications } from '@/lib/cosmic'
 
 export default async function HomePage() {
-  const [categories, featuredProducts, certifications] = await Promise.all([
+  // Fetch data with proper error handling to prevent build failures
+  const [categories, featuredProducts, certifications] = await Promise.allSettled([
     getCategories(),
     getFeaturedProducts(),
     getCertifications()
   ])
 
+  // Extract successful results, fallback to empty arrays for failed requests
+  const categoriesData = categories.status === 'fulfilled' ? categories.value : []
+  const featuredProductsData = featuredProducts.status === 'fulfilled' ? featuredProducts.value : []
+  const certificationsData = certifications.status === 'fulfilled' ? certifications.value : []
+
   return (
     <div className="min-h-screen">
       <HeroSection />
-      <ProductCategories categories={categories} />
-      <FeaturedProducts products={featuredProducts} />
-      <QualityCertifications certifications={certifications} />
+      <ProductCategories categories={categoriesData} />
+      <FeaturedProducts products={featuredProductsData} />
+      <QualityCertifications certifications={certificationsData} />
       <AboutSection />
       <ContactSection />
     </div>

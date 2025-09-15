@@ -29,7 +29,8 @@ export async function getProducts(): Promise<Product[]> {
     if (hasStatus(error) && error.status === 404) {
       return [];
     }
-    throw new Error('Failed to fetch products');
+    console.error('Error fetching products:', error);
+    return [];
   }
 }
 
@@ -44,7 +45,8 @@ export async function getProductBySlug(slug: string): Promise<Product | null> {
     if (hasStatus(error) && error.status === 404) {
       return null;
     }
-    throw error;
+    console.error('Error fetching product:', error);
+    return null;
   }
 }
 
@@ -55,15 +57,18 @@ export async function getFeaturedProducts(): Promise<Product[]> {
         type: 'products',
         'metadata.featured': true 
       })
-      .props(['id', 'title', 'slug', 'metadata'])
+      .props(['id', 'title', 'slug', 'metadata', 'created_at'])
       .depth(1);
     
     return response.objects as Product[];
   } catch (error) {
     if (hasStatus(error) && error.status === 404) {
+      console.log('No featured products found, returning empty array');
       return [];
     }
-    throw new Error('Failed to fetch featured products');
+    console.error('Error fetching featured products:', error);
+    // Return empty array instead of throwing to prevent build failures
+    return [];
   }
 }
 
@@ -79,7 +84,8 @@ export async function getCategories(): Promise<Category[]> {
     if (hasStatus(error) && error.status === 404) {
       return [];
     }
-    throw new Error('Failed to fetch categories');
+    console.error('Error fetching categories:', error);
+    return [];
   }
 }
 
@@ -93,7 +99,8 @@ export async function getCategoryBySlug(slug: string): Promise<Category | null> 
     if (hasStatus(error) && error.status === 404) {
       return null;
     }
-    throw error;
+    console.error('Error fetching category:', error);
+    return null;
   }
 }
 
@@ -162,6 +169,7 @@ export async function getCertifications(): Promise<Certification[]> {
     if (hasStatus(error) && error.status === 404) {
       return [];
     }
-    throw new Error('Failed to fetch certifications');
+    console.error('Error fetching certifications:', error);
+    return [];
   }
 }
