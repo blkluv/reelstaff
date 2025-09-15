@@ -5,10 +5,10 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 export const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-  apiVersion: '2024-06-20',
+  apiVersion: '2024-12-18.acacia',
 })
 
-export async function createPaymentIntent(amount: number, currency = 'usd') {
+export async function createPaymentIntent(amount: number, currency = 'usd'): Promise<Stripe.PaymentIntent> {
   try {
     const paymentIntent = await stripe.paymentIntents.create({
       amount: Math.round(amount * 100), // Convert to cents
@@ -25,7 +25,7 @@ export async function createPaymentIntent(amount: number, currency = 'usd') {
   }
 }
 
-export async function confirmPaymentIntent(paymentIntentId: string) {
+export async function confirmPaymentIntent(paymentIntentId: string): Promise<Stripe.PaymentIntent> {
   try {
     const paymentIntent = await stripe.paymentIntents.retrieve(paymentIntentId)
     return paymentIntent

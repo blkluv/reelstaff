@@ -102,7 +102,7 @@ export default function ProductCategories({ categories }: ProductCategoriesProps
                 <ArrowRight className="w-5 h-5" />
               </div>
 
-              {/* Featured Image */}
+              {/* Featured Image - only render if it exists */}
               {category.metadata?.featured_image && (
                 <div className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity duration-300 rounded-2xl overflow-hidden">
                   <img

@@ -1,4 +1,5 @@
 import { createBucketClient } from '@cosmicjs/sdk'
+import { Product, Category, Order, Certification, ContactMessage, BulkRequest } from '@/types'
 
 export const cosmic = createBucketClient({
   bucketSlug: process.env.COSMIC_BUCKET_SLUG as string,
@@ -12,14 +13,14 @@ function hasStatus(error: unknown): error is { status: number } {
 }
 
 // Product functions
-export async function getProducts(): Promise<any[]> {
+export async function getProducts(): Promise<Product[]> {
   try {
     const response = await cosmic.objects
       .find({ type: 'products' })
       .props(['id', 'title', 'slug', 'metadata'])
       .depth(1);
     
-    return response.objects.sort((a, b) => {
+    return response.objects.sort((a: Product, b: Product) => {
       const dateA = new Date(a.created_at).getTime();
       const dateB = new Date(b.created_at).getTime();
       return dateB - dateA;
@@ -32,13 +33,13 @@ export async function getProducts(): Promise<any[]> {
   }
 }
 
-export async function getProductBySlug(slug: string): Promise<any | null> {
+export async function getProductBySlug(slug: string): Promise<Product | null> {
   try {
     const response = await cosmic.objects
       .findOne({ type: 'products', slug })
       .depth(1);
     
-    return response.object;
+    return response.object as Product;
   } catch (error) {
     if (hasStatus(error) && error.status === 404) {
       return null;
@@ -47,7 +48,7 @@ export async function getProductBySlug(slug: string): Promise<any | null> {
   }
 }
 
-export async function getFeaturedProducts(): Promise<any[]> {
+export async function getFeaturedProducts(): Promise<Product[]> {
   try {
     const response = await cosmic.objects
       .find({ 
@@ -57,7 +58,7 @@ export async function getFeaturedProducts(): Promise<any[]> {
       .props(['id', 'title', 'slug', 'metadata'])
       .depth(1);
     
-    return response.objects;
+    return response.objects as Product[];
   } catch (error) {
     if (hasStatus(error) && error.status === 404) {
       return [];
@@ -67,13 +68,13 @@ export async function getFeaturedProducts(): Promise<any[]> {
 }
 
 // Category functions
-export async function getCategories(): Promise<any[]> {
+export async function getCategories(): Promise<Category[]> {
   try {
     const response = await cosmic.objects
       .find({ type: 'categories' })
       .props(['id', 'title', 'slug', 'metadata']);
     
-    return response.objects;
+    return response.objects as Category[];
   } catch (error) {
     if (hasStatus(error) && error.status === 404) {
       return [];
@@ -82,12 +83,12 @@ export async function getCategories(): Promise<any[]> {
   }
 }
 
-export async function getCategoryBySlug(slug: string): Promise<any | null> {
+export async function getCategoryBySlug(slug: string): Promise<Category | null> {
   try {
     const response = await cosmic.objects
       .findOne({ type: 'categories', slug });
     
-    return response.object;
+    return response.object as Category;
   } catch (error) {
     if (hasStatus(error) && error.status === 404) {
       return null;
@@ -97,7 +98,7 @@ export async function getCategoryBySlug(slug: string): Promise<any | null> {
 }
 
 // Order functions
-export async function createOrder(orderData: any): Promise<any> {
+export async function createOrder(orderData: Order['metadata']): Promise<Order> {
   try {
     const response = await cosmic.objects.insertOne({
       type: 'orders',
@@ -105,7 +106,7 @@ export async function createOrder(orderData: any): Promise<any> {
       metadata: orderData
     });
     
-    return response.object;
+    return response.object as Order;
   } catch (error) {
     console.error('Error creating order:', error);
     throw new Error('Failed to create order');
@@ -113,7 +114,7 @@ export async function createOrder(orderData: any): Promise<any> {
 }
 
 // Contact and bulk request functions
-export async function createContactMessage(messageData: any): Promise<any> {
+export async function createContactMessage(messageData: ContactMessage['metadata']): Promise<ContactMessage> {
   try {
     const response = await cosmic.objects.insertOne({
       type: 'contact_messages',
@@ -124,14 +125,14 @@ export async function createContactMessage(messageData: any): Promise<any> {
       }
     });
     
-    return response.object;
+    return response.object as ContactMessage;
   } catch (error) {
     console.error('Error creating contact message:', error);
     throw new Error('Failed to send message');
   }
 }
 
-export async function createBulkRequest(requestData: any): Promise<any> {
+export async function createBulkRequest(requestData: BulkRequest['metadata']): Promise<BulkRequest> {
   try {
     const response = await cosmic.objects.insertOne({
       type: 'bulk_requests',
@@ -142,7 +143,7 @@ export async function createBulkRequest(requestData: any): Promise<any> {
       }
     });
     
-    return response.object;
+    return response.object as BulkRequest;
   } catch (error) {
     console.error('Error creating bulk request:', error);
     throw new Error('Failed to submit bulk request');
@@ -150,13 +151,13 @@ export async function createBulkRequest(requestData: any): Promise<any> {
 }
 
 // Certification functions
-export async function getCertifications(): Promise<any[]> {
+export async function getCertifications(): Promise<Certification[]> {
   try {
     const response = await cosmic.objects
       .find({ type: 'certifications' })
       .props(['id', 'title', 'metadata']);
     
-    return response.objects;
+    return response.objects as Certification[];
   } catch (error) {
     if (hasStatus(error) && error.status === 404) {
       return [];
