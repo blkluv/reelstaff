@@ -78,13 +78,15 @@ export default function CheckoutForm({ onSubmit, isLoading }: CheckoutFormProps)
   const updateFormData = (field: string, value: string) => {
     if (field.startsWith('address.')) {
       const addressField = field.split('.')[1]
-      setFormData(prev => ({
-        ...prev,
-        address: {
-          ...prev.address,
-          [addressField]: value
-        }
-      }))
+      if (addressField) {
+        setFormData(prev => ({
+          ...prev,
+          address: {
+            ...prev.address,
+            [addressField]: value
+          }
+        }))
+      }
     } else {
       setFormData(prev => ({
         ...prev,
@@ -93,11 +95,12 @@ export default function CheckoutForm({ onSubmit, isLoading }: CheckoutFormProps)
     }
 
     // Clear error when user starts typing
-    if (errors[field] || errors[field.split('.')[1]]) {
+    const errorKey = field.startsWith('address.') ? field.split('.')[1] : field
+    if (errorKey && (errors[field] || errors[errorKey])) {
       setErrors(prev => ({
         ...prev,
         [field]: '',
-        [field.split('.')[1]]: ''
+        [errorKey]: ''
       }))
     }
   }
