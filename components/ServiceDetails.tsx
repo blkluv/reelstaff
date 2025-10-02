@@ -168,7 +168,7 @@ const handleAddToCart = async () => {
             </div>
 
             {/* Features */}
-            {service.metadata?.features && service.metadata.features.length > 0 && (
+        (Array.isArray(service.metadata?.features) ? service.metadata.features : []).map((feature, index) => (
               <div>
                 <h3 className="mb-3 text-lg font-semibold text-secondary-900">Service Features</h3>
                 <div className="space-y-2">
