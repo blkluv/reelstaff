@@ -9,21 +9,21 @@ import CosmicBadge from '@/components/CosmicBadge'
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
-  title: 'Nafees Cables - Powering Connections, Building Trust',
-  description: 'Leading manufacturer of electrical wires and cables. Quality products for residential, commercial, and industrial applications.',
-  keywords: 'electrical wires, power cables, communication cables, specialized cables, nafees cables',
-  authors: [{ name: 'Nafees Cables' }],
+  title: 'RFP.AUCTION - Blockchain-Powered RFP Platform',
+  description: 'Transform your procurement process with blockchain-verified RFP services, smart contract payments, and transparent auction solutions.',
+  keywords: 'RFP, auction, blockchain, procurement, smart contracts, vendor management, bidding',
+  authors: [{ name: 'RFP.AUCTION' }],
   openGraph: {
-    title: 'Nafees Cables - Powering Connections, Building Trust',
-    description: 'Leading manufacturer of electrical wires and cables. Quality products for residential, commercial, and industrial applications.',
-    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://nafeescables.com',
-    siteName: 'Nafees Cables',
+    title: 'RFP.AUCTION - Blockchain-Powered RFP Platform',
+    description: 'Transform your procurement process with blockchain-verified RFP services, smart contract payments, and transparent auction solutions.',
+    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://rfp.auction',
+    siteName: 'RFP.AUCTION',
     images: [
       {
-        url: 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&h=630&fit=crop&auto=format',
+        url: 'https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=1200&h=630&fit=crop&auto=format',
         width: 1200,
         height: 630,
-        alt: 'Nafees Cables',
+        alt: 'RFP.AUCTION Platform',
       },
     ],
     locale: 'en_US',
@@ -31,9 +31,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Nafees Cables - Powering Connections, Building Trust',
-    description: 'Leading manufacturer of electrical wires and cables. Quality products for residential, commercial, and industrial applications.',
-    images: ['https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&h=630&fit=crop&auto=format'],
+    title: 'RFP.AUCTION - Blockchain-Powered RFP Platform',
+    description: 'Transform your procurement process with blockchain-verified RFP services, smart contract payments, and transparent auction solutions.',
+    images: ['https://images.unsplash.com/photo-1639762681485-074b7f938ba0?w=1200&h=630&fit=crop&auto=format'],
   },
   robots: {
     index: true,
@@ -56,14 +56,14 @@ export default function RootLayout({
   const bucketSlug = process.env.COSMIC_BUCKET_SLUG as string
 
   return (
-    <html lang="en" className="scroll-smooth">
+    <html lang="en" className="scroll-smooth" suppressHydrationWarning>
       <head>
-        {/* Console capture script for dashboard debugging */}
-        <script src="/dashboard-console-capture.js" />
+        {/* Remove or comment out the console capture script to fix hydration errors */}
+        {/* <script src="/dashboard-console-capture.js" /> */}
       </head>
-      <body className={inter.className}>
+      <body className={inter.className} suppressHydrationWarning>
         <CartProvider>
-          <div className="min-h-screen flex flex-col">
+          <div className="flex flex-col min-h-screen">
             <Navigation />
             <main className="flex-grow">
               {children}

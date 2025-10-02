@@ -1,29 +1,29 @@
-// app/products/[slug]/page.tsx
+// app/services/[slug]/page.tsx
 import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
-import ProductDetails from '@/components/ProductDetails'
-import { getProductBySlug, getProducts } from '@/lib/cosmic'
-import { Product } from '@/types'
+import ServiceDetails from '@/components/ServiceDetails'
+import { getServiceBySlug, getServices } from '@/lib/cosmic'
+import { Service } from '@/types' // Import Service, not Product
 
-interface ProductPageProps {
+interface ServicePageProps {
   params: Promise<{ slug: string }>
 }
 
-export async function generateMetadata({ params }: ProductPageProps): Promise<Metadata> {
+export async function generateMetadata({ params }: ServicePageProps): Promise<Metadata> {
   const { slug } = await params
-  const product = await getProductBySlug(slug) as Product | null
+  const service = await getServiceBySlug(slug)
 
-  if (!product) {
+  if (!service) {
     return {
-      title: 'Product Not Found - Nafees Cables',
+      title: 'Service Not Found - RFP.AUCTION',
     }
   }
 
-  const title = `${product.title} - Nafees Cables`
-  const description = product.metadata?.description || `High-quality ${product.title} from Nafees Cables`
-  const image = product.metadata?.featured_image?.imgix_url 
-    ? `${product.metadata.featured_image.imgix_url}?w=1200&h=630&fit=crop&auto=format`
-    : 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&h=630&fit=crop&auto=format'
+  const title = `${service.title} - RFP.AUCTION`
+  const description = service.metadata?.description || `Professional ${service.title} service from RFP.AUCTION`
+  const image = service.metadata?.featured_image?.imgix_url 
+    ? `${service.metadata.featured_image.imgix_url}?w=1200&h=630&fit=crop&auto=format`
+    : 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=1200&h=630&fit=crop&auto=format'
 
   return {
     title,
@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
     openGraph: {
       title,
       description,
-      images: [{ url: image, width: 1200, height: 630, alt: product.title }],
+      images: [{ url: image, width: 1200, height: 630, alt: service.title }],
     },
     twitter: {
       card: 'summary_large_image',
@@ -43,24 +43,24 @@ export async function generateMetadata({ params }: ProductPageProps): Promise<Me
 }
 
 export async function generateStaticParams() {
-  const products = await getProducts()
+  const services = await getServices()
   
-  return products.map((product) => ({
-    slug: product.slug,
+  return services.map((service) => ({
+    slug: service.slug,
   }))
 }
 
-export default async function ProductPage({ params }: ProductPageProps) {
+export default async function ServicePage({ params }: ServicePageProps) {
   const { slug } = await params
-  const product = await getProductBySlug(slug) as Product | null
+  const service = await getServiceBySlug(slug)
 
-  if (!product) {
+  if (!service) {
     notFound()
   }
 
   return (
     <div className="min-h-screen bg-white">
-      <ProductDetails product={product} />
+      <ServiceDetails service={service} />
     </div>
   )
 }

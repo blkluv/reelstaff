@@ -1,8 +1,8 @@
-# Nafees Cables eCommerce Platform
+# RFP.AUCTION eCommerce Platform
 
-![Nafees Cables Preview](https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&h=300&fit=crop&auto=format)
+![RFP.AUCTION Preview](https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&h=300&fit=crop&auto=format)
 
-A modern, professional eCommerce platform for Nafees Cables, a leading manufacturer of electrical wires and cables. Built with Next.js 15, TypeScript, and Cosmic CMS to deliver a complete online shopping experience that reflects trust, durability, and innovation in the electrical industry.
+A modern, professional eCommerce platform for RFP.AUCTION, a leading manufacturer of electrical wires and cables. Built with Next.js 15, TypeScript, and Cosmic CMS to deliver a complete online shopping experience that reflects trust, durability, and innovation in the electrical industry.
 
 ## Features
 
@@ -28,11 +28,11 @@ This application was built using the following prompts to generate the content s
 
 ### Content Model Prompt
 
-> "Create a modern, professional eCommerce website for Nafees Cables, a leading manufacturer of electrical wires and cables. The design should reflect trust, durability, and innovation in the electrical industry.
+> "Create a modern, professional eCommerce website for RFP.AUCTION, a leading manufacturer of electrical wires and cables. The design should reflect trust, durability, and innovation in the electrical industry.
 
 The homepage should include:
 
-A clean hero section with the tagline: 'Powering Connections, Building Trust'
+A clean hero section with the tagline: 'Powering Faster RFP Wins'
 
 A showcase of product categories: Electrical Wires, Power Cables, Communication Cables, Specialized Cables
 
@@ -72,7 +72,7 @@ Make the site SEO-friendly, fast-loading, secure, and scalable for future produc
 
 ### Code Generation Prompt
 
-> "Create a modern, professional eCommerce website for Nafees Cables, a leading manufacturer of electrical wires and cables. The design should reflect trust, durability, and innovation in the electrical industry.
+> "Create a modern, professional eCommerce website for RFP.AUCTION, a leading manufacturer of electrical wires and cables. The design should reflect trust, durability, and innovation in the electrical industry.
 
 The homepage should include:
 

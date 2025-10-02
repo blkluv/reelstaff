@@ -43,6 +43,31 @@ export interface Product extends CosmicObject {
   };
 }
 
+// Service interface - ONLY ONE VERSION
+export interface Service extends CosmicObject {
+  type: 'rfp-services';
+  metadata: {
+    description?: string;
+    price?: number;
+    delivery_time?: string;
+    delivery_days?: number;
+    category?: string | Category;
+    featured_image?: {
+      url: string;
+      imgix_url: string;
+    };
+    features?: string[];
+    process?: string;
+    service_type?: string;
+    featured?: boolean;
+    images?: Array<{
+      url: string;
+      imgix_url: string;
+    }>;
+    certifications?: string[];
+  };
+}
+
 // Category interface
 export interface Category extends CosmicObject {
   type: 'categories';
@@ -161,11 +186,13 @@ export interface CosmicResponse<T> {
   skip: number;
 }
 
-// Filter types
+// Filter types - UPDATED with service fields
 export type ProductFilter = {
   category?: string;
   minPrice?: number;
   maxPrice?: number;
+  deliveryTime?: string;
+  serviceType?: string;
   usageType?: string;
   inStock?: boolean;
   search?: string;
@@ -210,7 +237,18 @@ export interface CheckoutFormData {
   notes?: string;
 }
 
-// Type guards
+// Service Standards Props
+export interface ServiceStandardsProps {
+  certifications: string[];
+}
+
+// Service Grid Props
+export interface ServiceGridProps {
+  services: Service[];
+  searchParams: { [key: string]: string | string[] | undefined };
+}
+
+// Type guards - ONLY ONE OF EACH
 export function isProduct(obj: CosmicObject): obj is Product {
   return obj.type === 'products';
 }
@@ -225,4 +263,8 @@ export function isOrder(obj: CosmicObject): obj is Order {
 
 export function isCertification(obj: CosmicObject): obj is Certification {
   return obj.type === 'certifications';
+}
+
+export function isService(obj: CosmicObject): obj is Service {
+  return obj.type === 'rfp-services';
 }

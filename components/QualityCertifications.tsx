@@ -1,5 +1,5 @@
 import { Certification } from '@/types'
-import { Shield, Award, CheckCircle, ExternalLink, Users, Clock, Zap, FileCheck, Blockchain, BadgeCheck, Lock, Target } from 'lucide-react'
+import { Shield, CheckCircle, Zap, BadgeCheck, Lock, Target } from 'lucide-react'
 
 interface BlockchainStandardsProps {
   certifications: Certification[]
@@ -61,16 +61,16 @@ export default function BlockchainStandards({ certifications }: BlockchainStanda
   const displayCertifications = certifications.length > 0 ? certifications : defaultCertifications
 
   return (
-    <section className="section-padding bg-gradient-to-br from-gray-900 to-blue-900 text-white">
+    <section className="text-white section-padding bg-gradient-to-br from-gray-900 to-blue-900">
       <div className="container-max">
-        <div className="text-center mb-16">
+        <div className="mb-16 text-center">
           <div className="flex items-center justify-center gap-3 mb-4">
-            <Blockchain className="w-8 h-8 text-blue-400" />
+            <Lock className="w-8 h-8 text-blue-400" />
             <h2 className="text-4xl font-bold text-white">
               Blockchain RFP Verification Standards
             </h2>
           </div>
-          <p className="text-lg text-blue-200 max-w-4xl mx-auto">
+          <p className="max-w-4xl mx-auto text-lg text-blue-200">
             We're revolutionizing the RFP process with blockchain technology that eliminates fraud, 
             ensures payment security, and provides transparent, verifiable results through tokenized identities, 
             smart contracts, and on-chain KPI tracking.
@@ -78,7 +78,7 @@ export default function BlockchainStandards({ certifications }: BlockchainStanda
         </div>
 
         {/* Blockchain Standards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+        <div className="grid grid-cols-1 gap-6 mb-16 md:grid-cols-2 lg:grid-cols-4">
           {displayCertifications.map((cert, index) => {
             const imageUrl = cert.metadata?.certificate_image?.imgix_url
               ? `${cert.metadata.certificate_image.imgix_url}?w=300&h=300&fit=crop&auto=format,compress`
@@ -87,10 +87,10 @@ export default function BlockchainStandards({ certifications }: BlockchainStanda
             return (
               <div
                 key={cert.id || index}
-                className="group bg-gray-800 rounded-xl p-6 text-center hover:bg-gray-700 transition-all duration-300 border border-gray-700 hover:border-blue-500 hover:-translate-y-1"
+                className="p-6 text-center transition-all duration-300 bg-gray-800 border border-gray-700 group rounded-xl hover:bg-gray-700 hover:border-blue-500 hover:-translate-y-1"
               >
-                {/* Blockchain Icon */}
-                <div className="w-16 h-16 mx-auto mb-4 rounded-xl bg-blue-900/50 shadow-sm flex items-center justify-center">
+                {/* Lock Icon */}
+                <div className="flex items-center justify-center w-16 h-16 mx-auto mb-4 shadow-sm rounded-xl bg-blue-900/50">
                   {index === 0 && <BadgeCheck className="w-8 h-8 text-blue-400" />}
                   {index === 1 && <Lock className="w-8 h-8 text-green-400" />}
                   {index === 2 && <Target className="w-8 h-8 text-purple-400" />}
@@ -102,19 +102,19 @@ export default function BlockchainStandards({ certifications }: BlockchainStanda
                   <h3 className="text-lg font-semibold text-white">
                     {cert.title}
                   </h3>
-                  <p className="text-sm text-blue-200 line-clamp-3 leading-relaxed">
+                  <p className="text-sm leading-relaxed text-blue-200 line-clamp-3">
                     {cert.metadata?.description}
                   </p>
                   {cert.metadata?.issuing_body && (
-                    <p className="text-xs text-gray-400 font-medium">
+                    <p className="text-xs font-medium text-gray-400">
                       {cert.metadata.issuing_body}
                     </p>
                   )}
                 </div>
 
                 {/* On-Chain Verification Badge */}
-                <div className="mt-4 flex items-center justify-center gap-1 text-green-400">
-                  <Blockchain className="w-4 h-4" />
+                <div className="flex items-center justify-center gap-1 mt-4 text-green-400">
+                  <Lock className="w-4 h-4" />
                   <span className="text-sm font-medium">On-Chain Verified</span>
                 </div>
               </div>
@@ -123,55 +123,55 @@ export default function BlockchainStandards({ certifications }: BlockchainStanda
         </div>
 
         {/* Problem & Solution Section */}
-        <div className="bg-gray-800 rounded-2xl border border-gray-700 p-8 mb-12">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div className="p-8 mb-12 bg-gray-800 border border-gray-700 rounded-2xl">
+          <div className="grid grid-cols-1 gap-8 lg:grid-cols-2">
             {/* Traditional RFP Problems */}
             <div>
-              <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
+              <h3 className="flex items-center gap-2 mb-6 text-2xl font-bold text-white">
                 <Shield className="w-6 h-6 text-red-400" />
                 Traditional RFP Process Problems
               </h3>
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-white text-sm">!</span>
+                  <div className="flex items-center justify-center flex-shrink-0 w-6 h-6 mt-1 bg-red-500 rounded-full">
+                    <span className="text-sm text-white">!</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-white mb-1">No Creator Verification</h4>
-                    <p className="text-blue-200 text-sm">
+                    <h4 className="mb-1 font-semibold text-white">No Creator Verification</h4>
+                    <p className="text-sm text-blue-200">
                       Fake profiles, unverified skills, and no reputation tracking leads to poor quality work
                     </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-white text-sm">!</span>
+                  <div className="flex items-center justify-center flex-shrink-0 w-6 h-6 mt-1 bg-red-500 rounded-full">
+                    <span className="text-sm text-white">!</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-white mb-1">Payment Disputes & Fraud</h4>
-                    <p className="text-blue-200 text-sm">
+                    <h4 className="mb-1 font-semibold text-white">Payment Disputes & Fraud</h4>
+                    <p className="text-sm text-blue-200">
                       Chargebacks, unpaid work, and payment delays destroy trust in the system
                     </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-white text-sm">!</span>
+                  <div className="flex items-center justify-center flex-shrink-0 w-6 h-6 mt-1 bg-red-500 rounded-full">
+                    <span className="text-sm text-white">!</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-white mb-1">Fake KPI Reporting</h4>
-                    <p className="text-blue-200 text-sm">
+                    <h4 className="mb-1 font-semibold text-white">Fake KPI Reporting</h4>
+                    <p className="text-sm text-blue-200">
                       Manipulated metrics, fake deliverables, and no accountability for results
                     </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-red-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <span className="text-white text-sm">!</span>
+                  <div className="flex items-center justify-center flex-shrink-0 w-6 h-6 mt-1 bg-red-500 rounded-full">
+                    <span className="text-sm text-white">!</span>
                   </div>
                   <div>
-                    <h4 className="font-semibold text-white mb-1">No Process Transparency</h4>
-                    <p className="text-blue-200 text-sm">
+                    <h4 className="mb-1 font-semibold text-white">No Process Transparency</h4>
+                    <p className="text-sm text-blue-200">
                       Black box operations, hidden fees, and no verifiable audit trails
                     </p>
                   </div>
@@ -181,51 +181,51 @@ export default function BlockchainStandards({ certifications }: BlockchainStanda
 
             {/* Blockchain Solutions */}
             <div>
-              <h3 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                <Blockchain className="w-6 h-6 text-green-400" />
+              <h3 className="flex items-center gap-2 mb-6 text-2xl font-bold text-white">
+                <Lock className="w-6 h-6 text-green-400" />
                 RFP.AUCTION Blockchain Solutions
               </h3>
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <div className="flex items-center justify-center flex-shrink-0 w-6 h-6 mt-1 bg-green-500 rounded-full">
                     <CheckCircle className="w-3 h-3 text-white" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-white mb-1">Tokenized Creator IDs</h4>
-                    <p className="text-blue-200 text-sm">
+                    <h4 className="mb-1 font-semibold text-white">Tokenized Creator IDs</h4>
+                    <p className="text-sm text-blue-200">
                       Every creator has an on-chain identity with verified skills, completion history, and reputation score
                     </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <div className="flex items-center justify-center flex-shrink-0 w-6 h-6 mt-1 bg-green-500 rounded-full">
                     <CheckCircle className="w-3 h-3 text-white" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-white mb-1">Smart Contract Escrow</h4>
-                    <p className="text-blue-200 text-sm">
+                    <h4 className="mb-1 font-semibold text-white">Smart Contract Escrow</h4>
+                    <p className="text-sm text-blue-200">
                       Funds locked in smart contracts with automatic release upon verified milestone completion
                     </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <div className="flex items-center justify-center flex-shrink-0 w-6 h-6 mt-1 bg-green-500 rounded-full">
                     <CheckCircle className="w-3 h-3 text-white" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-white mb-1">On-Chain KPI Verification</h4>
-                    <p className="text-blue-200 text-sm">
+                    <h4 className="mb-1 font-semibold text-white">On-Chain KPI Verification</h4>
+                    <p className="text-sm text-blue-200">
                       Immutable performance tracking with tokenized rewards for exceeding targets
                     </p>
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
-                  <div className="w-6 h-6 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <div className="flex items-center justify-center flex-shrink-0 w-6 h-6 mt-1 bg-green-500 rounded-full">
                     <CheckCircle className="w-3 h-3 text-white" />
                   </div>
                   <div>
-                    <h4 className="font-semibold text-white mb-1">Transparent Audit Trails</h4>
-                    <p className="text-blue-200 text-sm">
+                    <h4 className="mb-1 font-semibold text-white">Transparent Audit Trails</h4>
+                    <p className="text-sm text-blue-200">
                       Every RFP step recorded on blockchain with verifiable timestamps and outcomes
                     </p>
                   </div>
@@ -236,41 +236,41 @@ export default function BlockchainStandards({ certifications }: BlockchainStanda
         </div>
 
         {/* Blockchain Metrics */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-          <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-            <div className="text-2xl font-bold text-blue-400 mb-1">100%</div>
+        <div className="grid grid-cols-2 gap-6 text-center md:grid-cols-4">
+          <div className="p-6 bg-gray-800 border border-gray-700 rounded-xl">
+            <div className="mb-1 text-2xl font-bold text-blue-400">100%</div>
             <div className="text-sm text-blue-200">Verified Creators</div>
           </div>
-          <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-            <div className="text-2xl font-bold text-green-400 mb-1">$0</div>
+          <div className="p-6 bg-gray-800 border border-gray-700 rounded-xl">
+            <div className="mb-1 text-2xl font-bold text-green-400">$0</div>
             <div className="text-sm text-blue-200">Payment Disputes</div>
           </div>
-          <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-            <div className="text-2xl font-bold text-purple-400 mb-1">24/7</div>
+          <div className="p-6 bg-gray-800 border border-gray-700 rounded-xl">
+            <div className="mb-1 text-2xl font-bold text-purple-400">24/7</div>
             <div className="text-sm text-blue-200">Audit Trail</div>
           </div>
-          <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-            <div className="text-2xl font-bold text-orange-400 mb-1">1000+</div>
+          <div className="p-6 bg-gray-800 border border-gray-700 rounded-xl">
+            <div className="mb-1 text-2xl font-bold text-orange-400">1000+</div>
             <div className="text-sm text-blue-200">Smart Contracts Deployed</div>
           </div>
         </div>
 
         {/* CTA Section */}
-        <div className="text-center mt-12">
-          <div className="bg-blue-900/50 rounded-2xl p-8 max-w-2xl mx-auto border border-blue-700">
-            <h3 className="text-2xl font-bold text-white mb-3">
+        <div className="mt-12 text-center">
+          <div className="max-w-2xl p-8 mx-auto border border-blue-700 bg-blue-900/50 rounded-2xl">
+            <h3 className="mb-3 text-2xl font-bold text-white">
               Ready to Experience Trustless RFP Processing?
             </h3>
-            <p className="text-blue-200 mb-6">
+            <p className="mb-6 text-blue-200">
               Join the future of RFP management with blockchain-verified creators, 
               secure smart contract payments, and transparent on-chain results.
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <button className="bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-600 transition-colors flex items-center gap-2">
-                <Blockchain className="w-5 h-5" />
+            <div className="flex flex-col justify-center gap-4 sm:flex-row">
+              <button className="flex items-center gap-2 px-6 py-3 font-semibold text-white transition-colors bg-blue-500 rounded-lg hover:bg-blue-600">
+                <Lock className="w-5 h-5" />
                 Launch Your First Smart RFP
               </button>
-              <button className="border border-blue-400 text-blue-400 px-6 py-3 rounded-lg font-semibold hover:bg-blue-400/10 transition-colors">
+              <button className="px-6 py-3 font-semibold text-blue-400 transition-colors border border-blue-400 rounded-lg hover:bg-blue-400/10">
                 View Live Audit Dashboard
               </button>
             </div>

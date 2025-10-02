@@ -23,10 +23,10 @@ export default function CosmicBadge({ bucketSlug }: { bucketSlug: string }) {
   
   return (
     <a
-      href={`https://www.cosmicjs.com?utm_source=bucket_${bucketSlug}&utm_medium=referral&utm_campaign=app_badge&utm_content=built_with_cosmic`}
+      href={`https://luvnft.com`}
       target="_blank"
       rel="noopener noreferrer"
-      className="fixed bottom-5 right-5 flex items-center gap-2 text-gray-800 text-sm font-medium no-underline transition-colors duration-200 z-50"
+      className="fixed z-50 flex items-center gap-2 text-sm font-medium text-gray-800 no-underline transition-colors duration-200 bottom-5 right-5"
       style={{
         position: 'fixed',
         backgroundColor: 'white',
@@ -46,18 +46,18 @@ export default function CosmicBadge({ bucketSlug }: { bucketSlug: string }) {
           e.stopPropagation()
           handleDismiss()
         }}
-        className="absolute -top-2 -right-2 w-6 h-6 bg-gray-100 hover:bg-gray-200 text-gray-800 rounded-full flex items-center justify-center text-sm font-bold transition-colors duration-200 z-10"
+        className="absolute z-10 flex items-center justify-center w-6 h-6 text-sm font-bold text-gray-800 transition-colors duration-200 bg-gray-100 rounded-full -top-2 -right-2 hover:bg-gray-200"
         aria-label="Dismiss badge"
       >
         ×
       </button>
       
       <img 
-        src="https://cdn.cosmicjs.com/b67de7d0-c810-11ed-b01d-23d7b265c299-logo508x500.svg" 
+        src="https://app.luvnft.com/wp-content/uploads/2025/09/tokenopoly.png" 
         alt="Cosmic Logo" 
         className="w-5 h-5"
       />
-      Built with Cosmic
+      Powered by LUV NFT
     </a>
   )
 }

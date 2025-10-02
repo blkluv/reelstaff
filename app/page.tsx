@@ -4,25 +4,23 @@ import FeaturedServices from '@/components/FeaturedServices'
 import ServiceStandards from '@/components/ServiceStandards'
 import AboutSection from '@/components/AboutSection'
 import ContactSection from '@/components/ContactSection'
-import { getCategories, getActiveServices, getCertifications } from '@/lib/cosmic'
+import { getCategories, getServices } from '@/lib/cosmic' // Remove getCertifications
 
 export default async function HomePage() {
-  const [categories, activeServices, certifications] = await Promise.allSettled([
+  const [categories, services] = await Promise.allSettled([
     getCategories(),
-    getActiveServices(),
-    getCertifications()
+    getServices(), // Changed from getActiveServices
   ])
 
   const categoriesData = categories.status === 'fulfilled' ? categories.value : []
-  const activeServicesData = activeServices.status === 'fulfilled' ? activeServices.value : []
-  const certificationsData = certifications.status === 'fulfilled' ? certifications.value : []
+  const servicesData = services.status === 'fulfilled' ? services.value : []
 
   return (
     <div className="min-h-screen">
       <HeroSection />
       <ServiceCategories categories={categoriesData} />
-      <FeaturedServices services={activeServicesData} />
-      <ServiceStandards certifications={certificationsData} />
+      <FeaturedServices services={servicesData} />
+      <ServiceStandards certifications={[]} />
       <AboutSection />
       <ContactSection />
     </div>

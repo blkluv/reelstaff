@@ -47,7 +47,7 @@ export default function Navigation() {
                 <span className="text-white font-bold text-lg">NC</span>
               </div>
               <div>
-                <div className="font-bold text-xl text-secondary-900">Nafees Cables</div>
+                <div className="font-bold text-xl text-secondary-900">RFP.AUCTION</div>
                 <div className="text-xs text-secondary-500">Powering Connections</div>
               </div>
             </Link>
