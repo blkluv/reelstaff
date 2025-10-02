@@ -1,9 +1,9 @@
 import Link from 'next/link'
-import { Product } from '@/types'
+import { Services } from '@/types'
 import { ArrowRight, Clock, Zap, Star, FileText, TrendingUp } from 'lucide-react'
 
 interface FeaturedServicesProps {
-  services: Product[]
+  services: Services[]
 }
 
 export default function FeaturedServices({ services }: FeaturedServicesProps) {
