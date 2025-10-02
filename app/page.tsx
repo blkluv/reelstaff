@@ -7,14 +7,12 @@ import ContactSection from '@/components/ContactSection'
 import { getCategories, getActiveServices, getCertifications } from '@/lib/cosmic'
 
 export default async function HomePage() {
-  // Fetch data with proper error handling to prevent build failures
   const [categories, activeServices, certifications] = await Promise.allSettled([
     getCategories(),
     getActiveServices(),
     getCertifications()
   ])
 
-  // Extract successful results, fallback to empty arrays for failed requests
   const categoriesData = categories.status === 'fulfilled' ? categories.value : []
   const activeServicesData = activeServices.status === 'fulfilled' ? activeServices.value : []
   const certificationsData = certifications.status === 'fulfilled' ? certifications.value : []
