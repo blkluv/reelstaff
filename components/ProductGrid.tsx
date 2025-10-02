@@ -2,49 +2,49 @@
 
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
-import { useCart } from '@/contexts/CartContext'
-import { Product, ProductFilter } from '@/types'
-import { ShoppingCart, Eye, Star, Filter } from 'lucide-react'
+import { useCart } from '@/contexts/CartContext' // You'll need to update this context too
+import { Product, ProductFilter } from '@/types' // Update these types
+import { Clock, FileText, Zap, Star, Filter, Eye } from 'lucide-react'
 
-interface ProductGridProps {
-  products: Product[]
+interface ServiceGridProps {
+  services: Product[] // Should be Service[] type
   searchParams: { [key: string]: string | string[] | undefined }
 }
 
-export default function ProductGrid({ products, searchParams }: ProductGridProps) {
-  const { addToCart } = useCart()
+export default function ServiceGrid({ services, searchParams }: ServiceGridProps) {
+  const { addToCart } = useCart() // This will need to be updated for services
   const [sortBy, setSortBy] = useState('newest')
 
-  // Build filter object from search params
+  // Build filter object from search params - UPDATED FOR SERVICES
   const filters: ProductFilter = {
     category: typeof searchParams.category === 'string' ? searchParams.category : undefined,
     minPrice: typeof searchParams.minPrice === 'string' ? parseFloat(searchParams.minPrice) : undefined,
     maxPrice: typeof searchParams.maxPrice === 'string' ? parseFloat(searchParams.maxPrice) : undefined,
-    usageType: typeof searchParams.usageType === 'string' ? searchParams.usageType : undefined,
-    inStock: searchParams.inStock === 'true',
+    deliveryTime: typeof searchParams.deliveryTime === 'string' ? searchParams.deliveryTime : undefined,
+    serviceType: typeof searchParams.serviceType === 'string' ? searchParams.serviceType : undefined,
     search: typeof searchParams.search === 'string' ? searchParams.search : undefined,
   }
 
-  // Filter and sort products
-  const filteredProducts = useMemo(() => {
-    let filtered = products.filter((product) => {
+  // Filter and sort services - UPDATED FOR SERVICES
+  const filteredServices = useMemo(() => {
+    let filtered = services.filter((service) => {
       // Category filter
-      if (filters.category && product.metadata?.category?.slug !== filters.category) {
+      if (filters.category && service.metadata?.category?.slug !== filters.category) {
         return false
       }
 
       // Price range filter
-      const price = product.metadata?.price || 0
+      const price = service.metadata?.price || 0
       if (filters.minPrice && price < filters.minPrice) return false
       if (filters.maxPrice && price > filters.maxPrice) return false
 
-      // Usage type filter
-      if (filters.usageType && product.metadata?.usage_type !== filters.usageType) {
+      // Delivery time filter - NEW
+      if (filters.deliveryTime && service.metadata?.delivery_time !== filters.deliveryTime) {
         return false
       }
 
-      // Stock filter
-      if (filters.inStock && (product.metadata?.stock_quantity || 0) <= 0) {
+      // Service type filter - NEW
+      if (filters.serviceType && service.metadata?.service_type !== filters.serviceType) {
         return false
       }
 
@@ -52,9 +52,10 @@ export default function ProductGrid({ products, searchParams }: ProductGridProps
       if (filters.search) {
         const searchTerm = filters.search.toLowerCase()
         const searchableContent = [
-          product.title,
-          product.metadata?.description || '',
-          product.metadata?.category?.title || '',
+          service.title,
+          service.metadata?.description || '',
+          service.metadata?.category?.title || '',
+          service.metadata?.service_type || '',
         ].join(' ').toLowerCase()
         
         if (!searchableContent.includes(searchTerm)) {
@@ -65,7 +66,7 @@ export default function ProductGrid({ products, searchParams }: ProductGridProps
       return true
     })
 
-    // Sort products
+    // Sort services
     switch (sortBy) {
       case 'price-low':
         filtered.sort((a, b) => (a.metadata?.price || 0) - (b.metadata?.price || 0))
@@ -76,6 +77,10 @@ export default function ProductGrid({ products, searchParams }: ProductGridProps
       case 'name':
         filtered.sort((a, b) => a.title.localeCompare(b.title))
         break
+      case 'delivery-fast': // NEW SORT OPTION
+        // Sort by delivery time (you'll need a delivery time numeric value)
+        filtered.sort((a, b) => (a.metadata?.delivery_days || 999) - (b.metadata?.delivery_days || 999))
+        break
       case 'newest':
       default:
         filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
@@ -83,14 +88,14 @@ export default function ProductGrid({ products, searchParams }: ProductGridProps
     }
 
     return filtered
-  }, [products, filters, sortBy])
+  }, [services, filters, sortBy])
 
-  if (!products || products.length === 0) {
+  if (!services || services.length === 0) {
     return (
       <div className="text-center py-12">
-        <Filter className="w-16 h-16 text-secondary-300 mx-auto mb-4" />
-        <h3 className="text-xl font-semibold text-secondary-900 mb-2">No products found</h3>
-        <p className="text-secondary-600">Try adjusting your filters or search terms.</p>
+        <FileText className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+        <h3 className="text-xl font-semibold text-gray-900 mb-2">No services found</h3>
+        <p className="text-gray-600">Try adjusting your filters or search terms.</p>
       </div>
     )
   }
@@ -99,8 +104,8 @@ export default function ProductGrid({ products, searchParams }: ProductGridProps
     <div className="space-y-6">
       {/* Sort Controls */}
       <div className="flex justify-between items-center">
-        <p className="text-secondary-600">
-          Showing {filteredProducts.length} of {products.length} products
+        <p className="text-gray-600">
+          Showing {filteredServices.length} of {services.length} services
         </p>
         <select
           value={sortBy}
@@ -111,41 +116,44 @@ export default function ProductGrid({ products, searchParams }: ProductGridProps
           <option value="price-low">Price: Low to High</option>
           <option value="price-high">Price: High to Low</option>
           <option value="name">Name A-Z</option>
+          <option value="delivery-fast">Fastest Delivery</option> {/* NEW */}
         </select>
       </div>
 
-      {/* Products Grid */}
+      {/* Services Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-        {filteredProducts.map((product) => (
-          <div key={product.id} className="group card hover:shadow-lg transition-all duration-200">
-            {/* Product Image */}
+        {filteredServices.map((service) => (
+          <div key={service.id} className="group card hover:shadow-lg transition-all duration-200">
+            {/* Service Image */}
             <div className="relative overflow-hidden rounded-lg mb-4">
               <img
                 src={
-                  product.metadata?.featured_image?.imgix_url
-                    ? `${product.metadata.featured_image.imgix_url}?w=600&h=400&fit=crop&auto=format,compress`
-                    : 'https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=600&h=400&fit=crop&auto=format'
+                  service.metadata?.featured_image?.imgix_url
+                    ? `${service.metadata.featured_image.imgix_url}?w=600&h=400&fit=crop&auto=format,compress`
+                    : '/default-service-image.jpg' // Add a default service image
                 }
-                alt={product.title}
+                alt={service.title}
                 className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
               />
               
-              {/* Stock Status */}
+              {/* Delivery Time Badge - REPLACES STOCK STATUS */}
               <div className="absolute top-2 left-2">
-                {(product.metadata?.stock_quantity || 0) > 0 ? (
-                  <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded">
-                    In Stock
-                  </span>
-                ) : (
-                  <span className="bg-red-100 text-red-800 text-xs font-medium px-2 py-1 rounded">
-                    Out of Stock
-                  </span>
-                )}
+                <span className="bg-blue-100 text-blue-800 text-xs font-medium px-2 py-1 rounded flex items-center gap-1">
+                  <Clock className="w-3 h-3" />
+                  {service.metadata?.delivery_time || 'Custom'}
+                </span>
+              </div>
+
+              {/* Service Type Badge - NEW */}
+              <div className="absolute top-2 right-2">
+                <span className="bg-green-100 text-green-800 text-xs font-medium px-2 py-1 rounded">
+                  {service.metadata?.service_type || 'Service'}
+                </span>
               </div>
 
               {/* Featured Badge */}
-              {product.metadata?.featured && (
-                <div className="absolute top-2 right-2">
+              {service.metadata?.featured && (
+                <div className="absolute top-10 right-2">
                   <Star className="w-5 h-5 text-yellow-400 fill-current" />
                 </div>
               )}
@@ -153,52 +161,51 @@ export default function ProductGrid({ products, searchParams }: ProductGridProps
               {/* Quick Actions */}
               <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center space-x-2">
                 <Link
-                  href={`/products/${product.slug}`}
-                  className="bg-white text-secondary-900 p-2 rounded-full hover:bg-secondary-100 transition-colors duration-200"
+                  href={`/services/${service.slug}`}
+                  className="bg-white text-gray-900 p-2 rounded-full hover:bg-gray-100 transition-colors duration-200"
                   title="View Details"
                 >
                   <Eye className="w-5 h-5" />
                 </Link>
                 <button
-                  onClick={() => addToCart(product)}
-                  disabled={(product.metadata?.stock_quantity || 0) <= 0}
-                  className="bg-primary-600 text-white p-2 rounded-full hover:bg-primary-700 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={() => addToCart(service)} // This needs to be updated for services
+                  className="bg-blue-600 text-white p-2 rounded-full hover:bg-blue-700 transition-colors duration-200"
                   title="Add to Cart"
                 >
-                  <ShoppingCart className="w-5 h-5" />
+                  <FileText className="w-5 h-5" />
                 </button>
               </div>
             </div>
 
-            {/* Product Info */}
+            {/* Service Info */}
             <div className="space-y-3">
               <div>
-                {product.metadata?.category && (
-                  <span className="text-xs font-medium text-primary-600 uppercase tracking-wider">
-                    {product.metadata.category.title}
+                {service.metadata?.category && (
+                  <span className="text-xs font-medium text-blue-600 uppercase tracking-wider">
+                    {service.metadata.category.title}
                   </span>
                 )}
-                <h3 className="text-lg font-semibold text-secondary-900 mt-1 group-hover:text-primary-600 transition-colors duration-200">
-                  {product.title}
+                <h3 className="text-lg font-semibold text-gray-900 mt-1 group-hover:text-blue-600 transition-colors duration-200">
+                  {service.title}
                 </h3>
-                {product.metadata?.description && (
-                  <p className="text-sm text-secondary-600 line-clamp-2">
-                    {product.metadata.description}
+                {service.metadata?.description && (
+                  <p className="text-sm text-gray-600 line-clamp-2">
+                    {service.metadata.description}
                   </p>
                 )}
               </div>
 
-              {/* Technical Specs Preview */}
-              {product.metadata?.technical_specs && (
+              {/* Service Features Preview - REPLACES TECHNICAL SPECS */}
+              {service.metadata?.features && (
                 <div className="flex flex-wrap gap-1">
-                  {product.metadata.technical_specs.voltage && (
-                    <span className="text-xs bg-secondary-100 text-secondary-700 px-2 py-1 rounded">
-                      {product.metadata.technical_specs.voltage}
+                  {service.metadata.features.slice(0, 3).map((feature, index) => (
+                    <span key={index} className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
+                      {feature}
                     </span>
-                  )}
-                  {product.metadata.technical_specs.size && (
-                    <span className="text-xs bg-secondary-100 text-secondary-700 px-2 py-1 rounded">
-                      {product.metadata.technical_specs.size}
+                  ))}
+                  {service.metadata.features.length > 3 && (
+                    <span className="text-xs bg-gray-100 text-gray-700 px-2 py-1 rounded">
+                      +{service.metadata.features.length - 3} more
                     </span>
                   )}
                 </div>
@@ -206,15 +213,14 @@ export default function ProductGrid({ products, searchParams }: ProductGridProps
 
               {/* Price and Actions */}
               <div className="flex items-center justify-between pt-2">
-                <div className="text-xl font-bold text-primary-600">
-                  ${(product.metadata?.price || 0).toFixed(2)}
+                <div className="text-xl font-bold text-blue-600">
+                  ${(service.metadata?.price || 0).toFixed(2)}
                 </div>
                 <button
-                  onClick={() => addToCart(product)}
-                  disabled={(product.metadata?.stock_quantity || 0) <= 0}
-                  className="btn-primary text-sm px-4 py-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                  onClick={() => addToCart(service)} // This needs to be updated for services
+                  className="btn-primary text-sm px-4 py-2"
                 >
-                  Add to Cart
+                  Book Service
                 </button>
               </div>
             </div>
@@ -222,11 +228,11 @@ export default function ProductGrid({ products, searchParams }: ProductGridProps
         ))}
       </div>
 
-      {filteredProducts.length === 0 && products.length > 0 && (
+      {filteredServices.length === 0 && services.length > 0 && (
         <div className="text-center py-12">
-          <Filter className="w-16 h-16 text-secondary-300 mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-secondary-900 mb-2">No products match your filters</h3>
-          <p className="text-secondary-600">Try adjusting your search criteria to see more results.</p>
+          <Filter className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">No services match your filters</h3>
+          <p className="text-gray-600">Try adjusting your search criteria to see more results.</p>
         </div>
       )}
     </div>
