@@ -1,5 +1,5 @@
 import { createBucketClient } from '@cosmicjs/sdk'
-import { Product, Category, Order, Certification, ContactMessage, BulkRequest } from '@/types'
+import { Service, Category, Order, Certification, ContactMessage, BulkRequest } from '@/types'
 
 export const cosmic = createBucketClient({
   bucketSlug: process.env.COSMIC_BUCKET_SLUG as string,
@@ -12,15 +12,33 @@ function hasStatus(error: unknown): error is { status: number } {
   return typeof error === 'object' && error !== null && 'status' in error;
 }
 
-// Product functions
-export async function getProducts(): Promise<Product[]> {
+// RFP Service functions
+export async function getActiveServices(): Promise<Service[]> {
   try {
     const response = await cosmic.objects
-      .find({ type: 'products' })
-      .props(['id', 'title', 'slug', 'metadata'])
+      .find({ 
+        type: 'rfp-services',
+        'metadata.status': 'active'
+      })
+      .props([
+        'id', 
+        'title', 
+        'slug', 
+        'metadata.description',
+        'metadata.price',
+        'metadata.delivery_time',
+        'metadata.service_type',
+        'metadata.category',
+        'metadata.featured_image',
+        'metadata.features',
+        'metadata.deliverables',
+        'metadata.blockchain_verified',
+        'metadata.ai_powered',
+        'metadata.emergency_service'
+      ])
       .depth(1);
     
-    return response.objects.sort((a: Product, b: Product) => {
+    return response.objects.sort((a: Service, b: Service) => {
       const dateA = new Date(a.created_at).getTime();
       const dateB = new Date(b.created_at).getTime();
       return dateB - dateA;
@@ -29,50 +47,122 @@ export async function getProducts(): Promise<Product[]> {
     if (hasStatus(error) && error.status === 404) {
       return [];
     }
-    console.error('Error fetching products:', error);
+    console.error('Error fetching RFP services:', error);
     return [];
   }
 }
 
-export async function getProductBySlug(slug: string): Promise<Product | null> {
+export async function getServiceBySlug(slug: string): Promise<Service | null> {
   try {
     const response = await cosmic.objects
-      .findOne({ type: 'products', slug })
+      .findOne({ 
+        type: 'rfp-services', 
+        slug 
+      })
+      .props([
+        'id',
+        'title',
+        'slug',
+        'created_at',
+        'metadata.description',
+        'metadata.price',
+        'metadata.currency',
+        'metadata.delivery_time',
+        'metadata.delivery_days',
+        'metadata.service_type',
+        'metadata.category',
+        'metadata.features',
+        'metadata.deliverables',
+        'metadata.requirements',
+        'metadata.process_steps',
+        'metadata.included_services',
+        'metadata.excluded_services',
+        'metadata.target_audience',
+        'metadata.success_metrics',
+        'metadata.testimonials',
+        'metadata.featured_image',
+        'metadata.gallery',
+        'metadata.status',
+        'metadata.price_tier',
+        'metadata.blockchain_verified',
+        'metadata.ai_powered',
+        'metadata.emergency_service',
+        'metadata.satisfaction_guarantee',
+        'metadata.support_level',
+        'metadata.revision_limit',
+        'metadata.timeline_guarantee',
+        'metadata.industry_specialization',
+        'metadata.compliance_standards',
+        'metadata.sample_work_url',
+        'metadata.case_studies'
+      ])
       .depth(1);
     
-    return response.object as Product;
+    return response.object as Service;
   } catch (error) {
     if (hasStatus(error) && error.status === 404) {
       return null;
     }
-    console.error('Error fetching product:', error);
+    console.error('Error fetching RFP service:', error);
     return null;
   }
 }
 
-export async function getFeaturedProducts(): Promise<Product[]> {
+export async function getFeaturedServices(): Promise<Service[]> {
   try {
     const response = await cosmic.objects
       .find({ 
-        type: 'products',
-        'metadata.featured': true 
+        type: 'rfp-services',
+        'metadata.featured': true,
+        'metadata.status': 'active'
       })
-      .props(['id', 'title', 'slug', 'metadata', 'created_at'])
+      .props([
+        'id', 
+        'title', 
+        'slug', 
+        'metadata.description',
+        'metadata.price',
+        'metadata.delivery_time',
+        'metadata.service_type',
+        'metadata.category',
+        'metadata.featured_image',
+        'metadata.features',
+        'metadata.blockchain_verified'
+      ])
       .depth(1);
     
-    return response.objects as Product[];
+    return response.objects as Service[];
   } catch (error) {
     if (hasStatus(error) && error.status === 404) {
-      console.log('No featured products found, returning empty array');
+      console.log('No featured RFP services found, returning empty array');
       return [];
     }
-    console.error('Error fetching featured products:', error);
-    // Return empty array instead of throwing to prevent build failures
+    console.error('Error fetching featured RFP services:', error);
     return [];
   }
 }
 
-// Category functions
+// Service booking function
+export async function createServiceBooking(bookingData: any): Promise<any> {
+  try {
+    const response = await cosmic.objects.insertOne({
+      type: 'service-bookings',
+      title: `Service Booking - ${bookingData.service_title}`,
+      metadata: {
+        ...bookingData,
+        status: 'pending',
+        booking_date: new Date().toISOString()
+      }
+    });
+    
+    return response.object;
+  } catch (error) {
+    console.error('Error creating service booking:', error);
+    throw new Error('Failed to create service booking');
+  }
+}
+
+// Category functions (updated for RFP services)
 export async function getCategories(): Promise<Category[]> {
   try {
     const response = await cosmic.objects
@@ -104,30 +194,36 @@ export async function getCategoryBySlug(slug: string): Promise<Category | null> 
   }
 }
 
-// Order functions
-export async function createOrder(orderData: Order['metadata']): Promise<Order> {
+// RFP-specific order functions
+export async function createServiceOrder(orderData: any): Promise<Order> {
   try {
     const response = await cosmic.objects.insertOne({
-      type: 'orders',
-      title: `Order #${Date.now()}`,
-      metadata: orderData
+      type: 'service-orders',
+      title: `RFP Service Order - ${orderData.service_title}`,
+      metadata: {
+        ...orderData,
+        order_type: 'rfp_service',
+        status: 'confirmed',
+        order_date: new Date().toISOString()
+      }
     });
     
     return response.object as Order;
   } catch (error) {
-    console.error('Error creating order:', error);
-    throw new Error('Failed to create order');
+    console.error('Error creating service order:', error);
+    throw new Error('Failed to create service order');
   }
 }
 
-// Contact and bulk request functions
+// Contact and consultation request functions
 export async function createContactMessage(messageData: ContactMessage['metadata']): Promise<ContactMessage> {
   try {
     const response = await cosmic.objects.insertOne({
       type: 'contact_messages',
-      title: `Message from ${messageData.name}`,
+      title: `RFP Consultation from ${messageData.name}`,
       metadata: {
         ...messageData,
+        message_type: 'rfp_consultation',
         status: 'new'
       }
     });
@@ -139,25 +235,26 @@ export async function createContactMessage(messageData: ContactMessage['metadata
   }
 }
 
-export async function createBulkRequest(requestData: BulkRequest['metadata']): Promise<BulkRequest> {
+export async function createRFPRequest(requestData: any): Promise<BulkRequest> {
   try {
     const response = await cosmic.objects.insertOne({
-      type: 'bulk_requests',
-      title: `Bulk Request from ${requestData.customer_name}`,
+      type: 'rfp-requests',
+      title: `Custom RFP Request from ${requestData.company_name}`,
       metadata: {
         ...requestData,
-        status: 'pending'
+        request_type: 'custom_rfp',
+        status: 'pending_review'
       }
     });
     
     return response.object as BulkRequest;
   } catch (error) {
-    console.error('Error creating bulk request:', error);
-    throw new Error('Failed to submit bulk request');
+    console.error('Error creating RFP request:', error);
+    throw new Error('Failed to submit RFP request');
   }
 }
 
-// Certification functions
+// Certification functions (updated for RFP standards)
 export async function getCertifications(): Promise<Certification[]> {
   try {
     const response = await cosmic.objects
@@ -173,3 +270,8 @@ export async function getCertifications(): Promise<Certification[]> {
     return [];
   }
 }
+
+// Backward compatibility functions
+export const getProducts = getActiveServices;
+export const getProductBySlug = getServiceBySlug;
+export const getFeaturedProducts = getFeaturedServices;
