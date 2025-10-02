@@ -1,4 +1,4 @@
-import { Users, Zap, Globe, Award, ArrowRight, Clock, Brain, Blockchain, TrendingUp, Shield } from 'lucide-react'
+import { Users, Zap, Globe, Award, ArrowRight, Clock, Brain, TrendingUp, Shield } from 'lucide-react'
 import Link from 'next/link'
 
 export default function AboutSection() {
