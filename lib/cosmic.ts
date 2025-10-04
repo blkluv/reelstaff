@@ -96,9 +96,10 @@ function getDemoServiceBySlug(slug: string): Service {
     }
   }
   
-  // Return demo service if it exists
-  if (demoServices[slug]) {
-    return demoServices[slug]
+  // Return demo service if it exists - FIXED: Use bracket notation with type assertion
+  const demoService = demoServices[slug]
+  if (demoService) {
+    return demoService
   }
 
   // Create a safe fallback service with proper slug validation
@@ -215,7 +216,7 @@ export async function getServices(): Promise<Service[]> {
     
     // Log detailed image information
     console.log('=== SERVICE IMAGE DEBUG ===')
-    services.forEach(service => {
+    services.forEach((service: Service) => { // FIXED: Added type annotation
       if (service.metadata?.featured_image) {
         console.log(`📸 ${service.title}:`, {
           hasImage: true,
@@ -309,7 +310,7 @@ export async function getFeaturedServices(): Promise<Service[]> {
     const featuredServices = response.objects || []
     
     console.log('⭐ Featured services found:', featuredServices.length)
-    featuredServices.forEach(service => {
+    featuredServices.forEach((service: Service) => { // FIXED: Added type annotation
       console.log(`- ${service.title}:`, {
         featured: service.metadata?.featured,
         hasImage: !!service.metadata?.featured_image,
@@ -331,7 +332,7 @@ export async function getCategories(): Promise<Category[]> {
     const services = await getServices();
     const categoryMap = new Map();
     
-    services.forEach(service => {
+    services.forEach((service: Service) => { // FIXED: Added type annotation
       const category = service.metadata?.category;
       if (category) {
         // Handle both string and Category object
@@ -414,7 +415,7 @@ export async function debugAllServices() {
     const services = await getServices()
     console.log(`Total services found: ${services.length}`)
     
-    services.forEach((service, index) => {
+    services.forEach((service: Service, index: number) => { // FIXED: Added type annotations
       console.log(`\nService ${index + 1}:`)
       console.log(`- Title: ${service.title}`)
       console.log(`- Slug: ${service.slug}`)
@@ -446,7 +447,7 @@ export async function debugServiceImages() {
     
     const services = await getServices()
     
-    services.forEach(service => {
+    services.forEach((service: Service) => { // FIXED: Added type annotation
       console.log(`\n📸 ${service.title}`)
       console.log(`- Featured: ${service.metadata?.featured || false}`)
       
@@ -479,7 +480,7 @@ export async function getFeaturedServicesManual(): Promise<Service[]> {
     )
     
     console.log('⭐ Featured services found (manual filter):', featuredServices.length)
-    featuredServices.forEach(service => {
+    featuredServices.forEach((service: Service) => { // FIXED: Added type annotation
       console.log(`- ${service.title}`)
     })
     

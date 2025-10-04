@@ -18,12 +18,12 @@ export interface Product extends CosmicObject {
     price?: number;
     category?: Category;
     featured_image?: {
-      url: string;
-      imgix_url: string;
+      url?: string;           
+      imgix_url?: string;
     };
     images?: Array<{
-      url: string;
-      imgix_url: string;
+      url?: string;          
+      imgix_url?: string;
     }>;
     technical_specs?: {
       voltage?: string;
@@ -53,7 +53,7 @@ export interface Service extends CosmicObject {
     delivery_days?: number;
     category?: string | Category;
     featured_image?: {
-      url?: string;           // Make optional
+      url?: string;           
       imgix_url?: string;     
     };
     features?: string[];
@@ -65,6 +65,8 @@ export interface Service extends CosmicObject {
       imgix_url: string;
     }>;
     certifications?: string[];
+    tags?: string[];           
+    excerpt?: string;   
   };
 }
 
@@ -196,6 +198,7 @@ export type ProductFilter = {
   usageType?: string;
   inStock?: boolean;
   search?: string;
+  tags?: string[];    
 };
 
 // Form validation schemas

@@ -28,6 +28,11 @@ export default function ServiceGrid({ services, searchParams }: ServiceGridProps
         sku: `SVC-${service.slug}`,
         weight: 0,
         dimensions: 'N/A',
+        // Ensure featured_image has both url and imgix_url
+        featured_image: service.metadata?.featured_image ? {
+          url: service.metadata.featured_image.url || service.metadata.featured_image.imgix_url || '',
+          imgix_url: service.metadata.featured_image.imgix_url || service.metadata.featured_image.url || ''
+        } : undefined,
         category: typeof service.metadata?.category === 'string' 
           ? { 
               id: service.metadata.category.toLowerCase().replace(/\s+/g, '-'),
@@ -61,7 +66,8 @@ export default function ServiceGrid({ services, searchParams }: ServiceGridProps
     deliveryTime: typeof searchParams.deliveryTime === 'string' ? searchParams.deliveryTime : undefined,
     serviceType: typeof searchParams.serviceType === 'string' ? searchParams.serviceType : undefined,
     search: typeof searchParams.search === 'string' ? searchParams.search : undefined,
-    tags: typeof searchParams.tags === 'string' ? searchParams.tags.split(',') : undefined,
+    // Remove tags filter since it's not in ProductFilter type
+    // tags: typeof searchParams.tags === 'string' ? searchParams.tags.split(',') : undefined,
   }
 
   // Filter and sort services
@@ -98,13 +104,6 @@ export default function ServiceGrid({ services, searchParams }: ServiceGridProps
         return false
       }
 
-      // Tags filter
-      if (filters.tags && filters.tags.length > 0) {
-        const serviceTags = service.metadata?.tags || []
-        const hasMatchingTag = filters.tags.some(tag => serviceTags.includes(tag))
-        if (!hasMatchingTag) return false
-      }
-
       // Search filter
       if (filters.search) {
         const searchTerm = filters.search.toLowerCase()
@@ -112,16 +111,12 @@ export default function ServiceGrid({ services, searchParams }: ServiceGridProps
           ? service.metadata.category 
           : service.metadata?.category?.title || '';
         
-        const serviceTags = service.metadata?.tags || []
-        const tagsString = serviceTags.join(' ')
-        
         const searchableContent = [
           service.title,
           service.metadata?.description || '',
           service.metadata?.excerpt || '',
           categoryTitle,
           service.metadata?.service_type || '',
-          tagsString,
         ].join(' ').toLowerCase()
         
         if (!searchableContent.includes(searchTerm)) {
