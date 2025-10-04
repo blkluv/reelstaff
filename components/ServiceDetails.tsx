@@ -177,6 +177,7 @@ export default function ServiceDetails({ service }: ServiceDetailsProps) {
             </div>
 
             {/* Features */}
+<<<<<<< HEAD
             {features.length > 0 && (
               <div className="p-6 bg-secondary-50 rounded-xl">
                 <h3 className="mb-4 text-xl font-semibold text-secondary-900">Service Features</h3>
@@ -190,6 +191,21 @@ export default function ServiceDetails({ service }: ServiceDetailsProps) {
                 </div>
               </div>
             )}
+=======
+{Array.isArray(service.metadata?.features) && service.metadata.features.length > 0 && (
+  <div>
+    <h3 className="mb-3 text-lg font-semibold text-secondary-900">Service Features</h3>
+    <div className="space-y-2">
+      {service.metadata.features.map((feature, index) => (
+        <div key={index} className="flex items-center gap-2">
+          <CheckCircle className="flex-shrink-0 w-4 h-4 text-green-600" />
+          <span className="text-secondary-700">{feature}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+)}
+>>>>>>> 9ca1b1b7b2d229c3e337b80ec765ce95de80324c
 
             {/* Quantity and Actions */}
             <div className="space-y-6">
