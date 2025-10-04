@@ -53,8 +53,8 @@ export interface Service extends CosmicObject {
     delivery_days?: number;
     category?: string | Category;
     featured_image?: {
-      url: string;
-      imgix_url: string;
+      url?: string;           // Make optional
+      imgix_url?: string;     
     };
     features?: string[];
     process?: string;

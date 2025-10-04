@@ -11,20 +11,20 @@ export default function FeaturedServices({ services }: FeaturedServicesProps) {
   const defaultServices: Partial<Service>[] = [ // Changed from Product to Service
     {
       id: '1',
-      slug: '24-hour-rfp-rescue',
-      title: '24-Hour RFP Rescue',
+      slug: 'rfp-response-writing-service',
+      title: 'RFP Response Writing Service',
       type: 'rfp-services',
       created_at: new Date().toISOString(),
       modified_at: new Date().toISOString(),
       metadata: {
-        description: 'Emergency RFP completion service with guaranteed 24-hour turnaround for urgent deadlines',
-        price: 1497,
-        delivery_time: '24 Hours',
+        description: 'End-to-end RFP response creation. We draft compliant, persuasive proposals that win contracts.',
+        price: 3500,
+        delivery_time: '7 Days',
         service_type: 'emergency',
         features: ['Guaranteed 24-hour delivery', 'Expert RFP writing', 'Priority support', 'Unlimited revisions'],
         featured_image: {
-          url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71',
-          imgix_url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71'
+          url: 'https://imgix.cosmicjs.com/e9a89940-a06f-11f0-8c2f-71055d67fae4-wizard-of-hahz-rfp-ai-services.png',
+          imgix_url: 'https://imgix.cosmicjs.com/e9a89940-a06f-11f0-8c2f-71055d67fae4-wizard-of-hahz-rfp-ai-services.png'
         },
         featured: true
       }
@@ -32,16 +32,16 @@ export default function FeaturedServices({ services }: FeaturedServicesProps) {
     {
       id: '2',
       slug: 'government-rfp-template-pack',
-      title: 'Government RFP Template Pack',
+      title: 'Government RFP Template Service',
       type: 'rfp-services',
       created_at: new Date().toISOString(),
       modified_at: new Date().toISOString(),
       metadata: {
-        description: 'Complete suite of government-compliant RFP templates for federal, state, and local contracts',
-        price: 497,
-        delivery_time: 'Instant',
+        description: 'COur Government RFP Template Pack gives you everything you need to create air-tight government proposals that actually get approved.',
+        price: 200,
+        delivery_time: '24 Hours',
         service_type: 'template',
-        features: ['FAR/DFARS compliant', 'All 50 states covered', 'Scoring matrices included', 'Ready to use'],
+        features: ['Federal RFP Master Template', 'State & Local Government Templates', 'Compliance Checklists', 'Ready to use'],
         featured_image: {
           url: 'https://images.unsplash.com/photo-1589652717521-10c0d092dea9',
           imgix_url: 'https://images.unsplash.com/photo-1589652717521-10c0d092dea9'
@@ -51,17 +51,17 @@ export default function FeaturedServices({ services }: FeaturedServicesProps) {
     },
     {
       id: '3',
-      slug: 'ai-rfp-co-pilot',
-      title: 'AI RFP Co-Pilot',
+      slug: 'rapid-rfp-proposal-review',
+      title: 'Rapid RFP Proposal Review',
       type: 'rfp-services',
       created_at: new Date().toISOString(),
       modified_at: new Date().toISOString(),
       metadata: {
-        description: 'AI-powered RFP analysis and generation with custom training on your business requirements',
-        price: 297,
-        delivery_time: '1 Week',
-        service_type: 'ai',
-        features: ['Custom AI training', 'Unlimited RFP drafts', 'Vendor matching', 'Performance analytics'],
+        description: 'Fast compliance and quality review of your draft proposal. We check alignment with RFP requirements, scoring rubrics, and provide actionable edits to strengthen your submission.',
+        price: 600,
+        delivery_time: '24 Hours',
+        service_type: 'Consulting & Strategy',
+        features: ['Comprehensive Compliance & Alignment Audit', 'Strategic & Persuasive Enhancement', 'Actionable Feedback Delivery', 'Rapid Service Execution'],
         featured_image: {
           url: 'https://images.unsplash.com/photo-1677442136019-21780ecad995',
           imgix_url: 'https://images.unsplash.com/photo-1677442136019-21780ecad995'

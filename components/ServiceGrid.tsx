@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import { useCart } from '@/contexts/CartContext'
 import { Service, ProductFilter, Product } from '@/types'
-import { Clock, FileText, Star, Filter, Eye } from 'lucide-react'
+import { Clock, FileText, Star, Filter, Eye, Tag, CheckCircle } from 'lucide-react'
 
 interface ServiceGridProps {
   services: Service[] | undefined
@@ -24,12 +24,10 @@ export default function ServiceGrid({ services, searchParams }: ServiceGridProps
         ...service.metadata,
         stock_quantity: 1,
         usage_type: 'commercial' as const,
-        // Ensure all required Product fields are present
         technical_specs: {},
         sku: `SVC-${service.slug}`,
         weight: 0,
         dimensions: 'N/A',
-        // Handle category conversion
         category: typeof service.metadata?.category === 'string' 
           ? { 
               id: service.metadata.category.toLowerCase().replace(/\s+/g, '-'),
@@ -45,8 +43,15 @@ export default function ServiceGrid({ services, searchParams }: ServiceGridProps
     }
   }
 
-  // Ensure services is always an array
-  const safeServices = Array.isArray(services) ? services : []
+  // Ensure services is always an array with proper validation
+  const safeServices = useMemo(() => {
+    if (!Array.isArray(services)) return []
+    
+    return services.filter(service => {
+      const isValid = service && service.id && service.slug && service.title
+      return isValid
+    })
+  }, [services])
 
   // Build filter object from search params
   const filters: ProductFilter = {
@@ -56,17 +61,17 @@ export default function ServiceGrid({ services, searchParams }: ServiceGridProps
     deliveryTime: typeof searchParams.deliveryTime === 'string' ? searchParams.deliveryTime : undefined,
     serviceType: typeof searchParams.serviceType === 'string' ? searchParams.serviceType : undefined,
     search: typeof searchParams.search === 'string' ? searchParams.search : undefined,
+    tags: typeof searchParams.tags === 'string' ? searchParams.tags.split(',') : undefined,
   }
 
-  // Filter and sort services - with safe array handling
+  // Filter and sort services
   const filteredServices = useMemo(() => {
-    // Double safety check
     if (!Array.isArray(safeServices) || safeServices.length === 0) {
       return []
     }
 
     let filtered = safeServices.filter((service) => {
-      // Category filter - handle both string and Category object
+      // Category filter
       if (filters.category) {
         const serviceCategory = service.metadata?.category;
         if (typeof serviceCategory === 'string') {
@@ -93,6 +98,13 @@ export default function ServiceGrid({ services, searchParams }: ServiceGridProps
         return false
       }
 
+      // Tags filter
+      if (filters.tags && filters.tags.length > 0) {
+        const serviceTags = service.metadata?.tags || []
+        const hasMatchingTag = filters.tags.some(tag => serviceTags.includes(tag))
+        if (!hasMatchingTag) return false
+      }
+
       // Search filter
       if (filters.search) {
         const searchTerm = filters.search.toLowerCase()
@@ -100,11 +112,16 @@ export default function ServiceGrid({ services, searchParams }: ServiceGridProps
           ? service.metadata.category 
           : service.metadata?.category?.title || '';
         
+        const serviceTags = service.metadata?.tags || []
+        const tagsString = serviceTags.join(' ')
+        
         const searchableContent = [
           service.title,
           service.metadata?.description || '',
+          service.metadata?.excerpt || '',
           categoryTitle,
           service.metadata?.service_type || '',
+          tagsString,
         ].join(' ').toLowerCase()
         
         if (!searchableContent.includes(searchTerm)) {
@@ -126,12 +143,21 @@ export default function ServiceGrid({ services, searchParams }: ServiceGridProps
       case 'name':
         filtered.sort((a, b) => a.title?.localeCompare(b.title || '') || 0)
         break
+      case 'featured':
+        filtered.sort((a, b) => (b.metadata?.featured ? 1 : 0) - (a.metadata?.featured ? 1 : 0))
+        break
       case 'delivery-fast':
-        // Use delivery_days if available, otherwise fallback
         filtered.sort((a, b) => {
-          const aDays = a.metadata?.delivery_days || (a.metadata?.delivery_time ? 999 : 1000);
-          const bDays = b.metadata?.delivery_days || (b.metadata?.delivery_time ? 999 : 1000);
-          return aDays - bDays;
+          const getDeliveryDays = (service: Service) => {
+            if (!service.metadata?.delivery_time) return 1000
+            const time = service.metadata.delivery_time.toLowerCase()
+            if (time.includes('1-2') || time.includes('24')) return 1
+            if (time.includes('3-5')) return 3
+            if (time.includes('7-10')) return 7
+            if (time.includes('14')) return 14
+            return 1000
+          }
+          return getDeliveryDays(a) - getDeliveryDays(b)
         })
         break
       case 'newest':
@@ -142,6 +168,15 @@ export default function ServiceGrid({ services, searchParams }: ServiceGridProps
 
     return filtered
   }, [safeServices, filters, sortBy])
+
+  // Handle service click with validation
+  const handleServiceClick = (service: Service, e: React.MouseEvent) => {
+    if (!service.slug) {
+      e.preventDefault()
+      console.error('Cannot navigate: Service missing slug', service)
+      return
+    }
+  }
 
   // Show loading state while services is undefined
   if (!Array.isArray(services)) {
@@ -177,131 +212,177 @@ export default function ServiceGrid({ services, searchParams }: ServiceGridProps
   return (
     <div className="space-y-6">
       {/* Sort Controls */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <p className="text-gray-600">
           Showing {filteredServices.length} of {safeServices.length} services
         </p>
-        <select
-          value={sortBy}
-          onChange={(e) => setSortBy(e.target.value)}
-          className="input-field max-w-48"
-        >
-          <option value="newest">Newest First</option>
-          <option value="price-low">Price: Low to High</option>
-          <option value="price-high">Price: High to Low</option>
-          <option value="name">Name A-Z</option>
-          <option value="delivery-fast">Fastest Delivery</option>
-        </select>
+        <div className="flex items-center gap-4">
+          <span className="text-sm text-gray-600">Sort by:</span>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value)}
+            className="input-field max-w-48"
+          >
+            <option value="newest">Newest First</option>
+            <option value="featured">Featured</option>
+            <option value="price-low">Price: Low to High</option>
+            <option value="price-high">Price: High to Low</option>
+            <option value="name">Name A-Z</option>
+            <option value="delivery-fast">Fastest Delivery</option>
+          </select>
+        </div>
       </div>
 
       {/* Services Grid */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {filteredServices.map((service) => (
-          <div key={service.id} className="transition-all duration-200 group card hover:shadow-lg">
-            {/* Service Image */}
-            <div className="relative mb-4 overflow-hidden rounded-lg">
-              <img
-                src={
-                  service.metadata?.featured_image?.imgix_url
-                    ? `${service.metadata.featured_image.imgix_url}?w=600&h=400&fit=crop&auto=format,compress`
-                    : '/default-service-image.jpg'
-                }
-                alt={service.title}
-                className="object-cover w-full h-48 transition-transform duration-300 group-hover:scale-105"
-              />
-              
-              {/* Delivery Time Badge */}
-              <div className="absolute top-2 left-2">
-                <span className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-blue-800 bg-blue-100 rounded">
-                  <Clock className="w-3 h-3" />
-                  {service.metadata?.delivery_time || 'Custom'}
-                </span>
-              </div>
+        {filteredServices.map((service) => {
+          const serviceLink = `/services/${service.slug}`
+          const imageUrl = service.metadata?.featured_image?.imgix_url
+            ? `${service.metadata.featured_image.imgix_url}?w=600&h=400&fit=crop&auto=format,compress`
+            : '/default-service-image.jpg'
+          
+          const excerpt = service.metadata?.excerpt || service.metadata?.description?.substring(0, 120) + '...'
+          const tags = service.metadata?.tags || []
+          const features = service.metadata?.features || []
+          const isFeatured = service.metadata?.featured
 
-              {/* Service Type Badge */}
-              <div className="absolute top-2 right-2">
-                <span className="px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded">
-                  {service.metadata?.service_type || 'Service'}
-                </span>
-              </div>
-
-              {/* Featured Badge */}
-              {service.metadata?.featured && (
-                <div className="absolute top-10 right-2">
-                  <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                </div>
-              )}
-
-              {/* Quick Actions */}
-              <div className="absolute inset-0 flex items-center justify-center space-x-2 transition-opacity duration-200 opacity-0 bg-black/60 group-hover:opacity-100">
-                <Link
-                  href={`/services/${service.slug}`}
-                  className="p-2 text-gray-900 transition-colors duration-200 bg-white rounded-full hover:bg-gray-100"
-                  title="View Details"
-                >
-                  <Eye className="w-5 h-5" />
+          return (
+            <div key={service.id} className={`transition-all duration-200 group card hover:shadow-lg ${isFeatured ? 'ring-2 ring-yellow-400' : ''}`}>
+              {/* Service Image with Link */}
+              <div className="relative mb-4 overflow-hidden rounded-lg">
+                <Link href={serviceLink} onClick={(e) => handleServiceClick(service, e)}>
+                  <img
+                    src={imageUrl}
+                    alt={service.title}
+                    className="object-cover w-full h-48 transition-transform duration-300 cursor-pointer group-hover:scale-105"
+                  />
                 </Link>
-                <button
-                  onClick={() => addToCart(convertServiceToProduct(service))}
-                  className="p-2 text-white transition-colors duration-200 bg-blue-600 rounded-full hover:bg-blue-700"
-                  title="Add to Cart"
-                >
-                  <FileText className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-
-            {/* Service Info */}
-            <div className="space-y-3">
-              <div>
-                {service.metadata?.category && (
-                  <span className="text-xs font-medium tracking-wider text-blue-600 uppercase">
-                    {typeof service.metadata.category === 'string' 
-                      ? service.metadata.category 
-                      : service.metadata.category.title}
-                  </span>
-                )}
-                <h3 className="mt-1 text-lg font-semibold text-gray-900 transition-colors duration-200 group-hover:text-blue-600">
-                  {service.title}
-                </h3>
-                {service.metadata?.description && (
-                  <p className="text-sm text-gray-600 line-clamp-2">
-                    {service.metadata.description}
-                  </p>
-                )}
-              </div>
-
-              {/* Service Features Preview */}
-              {service.metadata?.features && (
-                <div className="flex flex-wrap gap-1">
-                  {service.metadata.features.slice(0, 3).map((feature: string, index: number) => (
-                    <span key={index} className="px-2 py-1 text-xs text-gray-700 bg-gray-100 rounded">
-                      {feature}
+                
+                {/* Featured Badge */}
+                {isFeatured && (
+                  <div className="absolute top-2 left-2">
+                    <span className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-yellow-800 bg-yellow-100 rounded">
+                      <Star className="w-3 h-3 fill-current" />
+                      Featured
                     </span>
-                  ))}
-                  {service.metadata.features.length > 3 && (
-                    <span className="px-2 py-1 text-xs text-gray-700 bg-gray-100 rounded">
-                      +{service.metadata.features.length - 3} more
+                  </div>
+                )}
+
+                {/* Delivery Time Badge */}
+                <div className="absolute top-2 right-2">
+                  <span className="flex items-center gap-1 px-2 py-1 text-xs font-medium text-blue-800 bg-blue-100 rounded">
+                    <Clock className="w-3 h-3" />
+                    {service.metadata?.delivery_time || 'Custom'}
+                  </span>
+                </div>
+
+                {/* Service Type Badge */}
+                {service.metadata?.service_type && (
+                  <div className="absolute bottom-2 left-2">
+                    <span className="px-2 py-1 text-xs font-medium text-green-800 bg-green-100 rounded">
+                      {service.metadata.service_type}
+                    </span>
+                  </div>
+                )}
+
+                {/* Quick Actions */}
+                <div className="absolute inset-0 flex items-center justify-center space-x-2 transition-opacity duration-200 opacity-0 bg-black/60 group-hover:opacity-100">
+                  <Link
+                    href={serviceLink}
+                    onClick={(e) => handleServiceClick(service, e)}
+                    className="p-2 text-gray-900 transition-colors duration-200 bg-white rounded-full hover:bg-gray-100"
+                    title="View Details"
+                  >
+                    <Eye className="w-5 h-5" />
+                  </Link>
+                  <button
+                    onClick={() => addToCart(convertServiceToProduct(service))}
+                    className="p-2 text-white transition-colors duration-200 bg-blue-600 rounded-full hover:bg-blue-700"
+                    title="Add to Cart"
+                  >
+                    <FileText className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Service Info */}
+              <div className="space-y-3">
+                <div>
+                  {/* Category */}
+                  {service.metadata?.category && (
+                    <span className="text-xs font-medium tracking-wider text-blue-600 uppercase">
+                      {typeof service.metadata.category === 'string' 
+                        ? service.metadata.category 
+                        : service.metadata.category.title}
                     </span>
                   )}
+                  
+                  {/* Title */}
+                  <Link href={serviceLink} onClick={(e) => handleServiceClick(service, e)}>
+                    <h3 className="mt-1 text-lg font-semibold text-gray-900 transition-colors duration-200 cursor-pointer group-hover:text-blue-600 line-clamp-2">
+                      {service.title}
+                    </h3>
+                  </Link>
+                  
+                  {/* Excerpt/Description */}
+                  <p className="text-sm text-gray-600 line-clamp-2">
+                    {excerpt}
+                  </p>
                 </div>
-              )}
 
-              {/* Price and Actions */}
-              <div className="flex items-center justify-between pt-2">
-                <div className="text-xl font-bold text-blue-600">
-                  ${(service.metadata?.price || 0).toFixed(2)}
+                {/* Tags */}
+                {tags.length > 0 && (
+                  <div className="flex flex-wrap gap-1">
+                    {tags.slice(0, 3).map((tag: string, index: number) => (
+                      <span key={index} className="flex items-center gap-1 px-2 py-1 text-xs text-gray-700 bg-gray-100 rounded">
+                        <Tag className="w-3 h-3" />
+                        {tag}
+                      </span>
+                    ))}
+                    {tags.length > 3 && (
+                      <span className="px-2 py-1 text-xs text-gray-700 bg-gray-100 rounded">
+                        +{tags.length - 3} more
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                {/* Key Features Preview */}
+                {features.length > 0 && (
+                  <div className="space-y-1">
+                    <h4 className="text-xs font-semibold text-gray-700 uppercase">Key Features:</h4>
+                    <div className="flex flex-wrap gap-1">
+                      {features.slice(0, 2).map((feature: string, index: number) => (
+                        <span key={index} className="flex items-center gap-1 px-2 py-1 text-xs text-green-700 rounded bg-green-50">
+                          <CheckCircle className="w-3 h-3" />
+                          {feature}
+                        </span>
+                      ))}
+                      {features.length > 2 && (
+                        <span className="px-2 py-1 text-xs text-gray-700 bg-gray-100 rounded">
+                          +{features.length - 2} more
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Price and Actions */}
+                <div className="flex items-center justify-between pt-2">
+                  <div className="text-xl font-bold text-blue-600">
+                    ${(service.metadata?.price || 0).toFixed(2)}
+                  </div>
+                  <button
+                    onClick={() => addToCart(convertServiceToProduct(service))}
+                    className="px-4 py-2 text-sm btn-primary"
+                  >
+                    Book Service
+                  </button>
                 </div>
-                <button
-                  onClick={() => addToCart(convertServiceToProduct(service))}
-                  className="px-4 py-2 text-sm btn-primary"
-                >
-                  Book Service
-                </button>
               </div>
             </div>
-          </div>
-        ))}
+          )
+        })}
       </div>
 
       {filteredServices.length === 0 && safeServices.length > 0 && (

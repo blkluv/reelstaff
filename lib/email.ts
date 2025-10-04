@@ -17,7 +17,7 @@ export async function sendOrderConfirmation(
 ) {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'RFP.AUCTION <orders@nafeescables.com>',
+      from: 'RFP.AUCTION <win@rfp.auction>',
       to: [email],
       subject: `Order Confirmation - ${orderDetails.orderNumber}`,
       html: `
@@ -66,8 +66,8 @@ export async function sendContactMessage(
 ) {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'RFP.AUCTION <contact@nafeescables.com>',
-      to: ['admin@nafeescables.com'],
+      from: 'RFP.AUCTION <win@rfp.auction>',
+      to: ['win@rfp.auction'],
       subject: `New Contact Message: ${subject}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
@@ -110,8 +110,8 @@ export async function sendBulkRequestNotification(
 ) {
   try {
     const { data, error } = await resend.emails.send({
-      from: 'RFP.AUCTION <bulk@nafeescables.com>',
-      to: ['sales@nafeescables.com'],
+      from: 'RFP.AUCTION <win@rfp.auction>',
+      to: ['win@rfp.auction'],
       subject: `New Bulk Order Request from ${company}`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">

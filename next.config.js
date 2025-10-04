@@ -11,6 +11,20 @@ const nextConfig = {
       },
     ]
   },
+  // Add this to handle service worker issues
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Service-Worker-Allowed',
+            value: '/'
+          },
+        ],
+      },
+    ]
+  },
 }
 
 module.exports = nextConfig

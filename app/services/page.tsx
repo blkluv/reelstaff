@@ -1,3 +1,4 @@
+// app/services/page.tsx - SERVICES LIST PAGE (SHOWS ALL SERVICES)
 import { Suspense } from 'react'
 import ServiceGrid from '@/components/ServiceGrid'
 import ProductFilters from '@/components/ServiceFilters'
@@ -15,15 +16,18 @@ export default async function ServicesPage({
 }) {
   const params = await searchParams
   
-  // Fetch data with proper error handling to prevent build failures
+  console.log('🔄 Loading SERVICES LIST page...')
+  
+  // Get ALL services for the grid
   const [services, categories] = await Promise.allSettled([
-    getServices(),
+    getServices(), // This gets ALL services
     getCategories()
   ])
 
-  // Extract successful results, fallback to empty arrays for failed requests
   const servicesData = services.status === 'fulfilled' ? services.value : []
   const categoriesData = categories.status === 'fulfilled' ? categories.value : []
+
+  console.log('✅ Services list loaded with', servicesData.length, 'services')
 
   return (
     <div className="min-h-screen bg-secondary-50">

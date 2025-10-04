@@ -11,54 +11,53 @@ export default function Navigation() {
 
   const navLinks = [
     { href: '/', label: 'Home' },
-    { href: '/shop', label: 'Products' },
-    { href: '/about', label: 'About' },
-    { href: '/contact', label: 'Contact' },
+    { href: 'https://rfp.auction/services', label: 'Services' },
+    { href: 'https://crypto.rfp.auction', label: 'Crypto RFP' },
   ]
 
   return (
     <>
       {/* Top Bar */}
-      <div className="bg-primary-800 text-white py-2 px-4">
-        <div className="container-max flex justify-between items-center text-sm">
+      <div className="px-4 py-2 text-white bg-primary-800">
+        <div className="flex items-center justify-between text-sm container-max">
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
               <Phone className="w-4 h-4" />
-              <span>+1 (555) 123-4567</span>
+              <span>+1 (404) 889-5545</span>
             </div>
-            <div className="hidden sm:flex items-center space-x-2">
+            <div className="items-center hidden space-x-2 sm:flex">
               <Mail className="w-4 h-4" />
-              <span>info@nafeescables.com</span>
+              <span>win@nrfp.auction</span>
             </div>
           </div>
           <div className="text-xs">
-            Quality Assured • ISO Certified
+            Same Day RFP Services
           </div>
         </div>
       </div>
 
       {/* Main Navigation */}
-      <nav className="bg-white shadow-sm sticky top-0 z-50">
+      <nav className="sticky top-0 z-50 bg-white shadow-sm">
         <div className="container-max">
-          <div className="flex justify-between items-center h-16">
+          <div className="flex items-center justify-between h-16">
             {/* Logo */}
-            <Link href="/" className="flex items-center space-x-2">
-              <div className="w-10 h-10 bg-primary-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">NC</span>
+            <Link href="https://rfp.auction" className="flex items-center space-x-2">
+              <div className="flex items-center justify-center w-10 h-10 rounded-lg bg-primary-600">
+                <span className="text-lg font-bold text-white">⚡</span>
               </div>
               <div>
-                <div className="font-bold text-xl text-secondary-900">RFP.AUCTION</div>
-                <div className="text-xs text-secondary-500">Powering Connections</div>
+                <div className="text-xl font-bold text-secondary-900">RFP.AUCTION</div>
+                <div className="text-xs text-secondary-500">Modern RFP Services powered by AI & Blockcahin Tech</div>
               </div>
             </Link>
 
             {/* Desktop Navigation */}
-            <div className="hidden md:flex items-center space-x-8">
+            <div className="items-center hidden space-x-8 md:flex">
               {navLinks.map((link) => (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className="text-secondary-700 hover:text-primary-600 font-medium transition-colors duration-200"
+                  className="font-medium transition-colors duration-200 text-secondary-700 hover:text-primary-600"
                 >
                   {link.label}
                 </Link>
@@ -70,11 +69,11 @@ export default function Navigation() {
               {/* Cart */}
               <Link
                 href="/cart"
-                className="relative p-2 text-secondary-700 hover:text-primary-600 transition-colors duration-200"
+                className="relative p-2 transition-colors duration-200 text-secondary-700 hover:text-primary-600"
               >
                 <ShoppingCart className="w-6 h-6" />
                 {itemCount > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-primary-600 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  <span className="absolute flex items-center justify-center w-5 h-5 text-xs text-white rounded-full -top-1 -right-1 bg-primary-600">
                     {itemCount}
                   </span>
                 )}
@@ -83,7 +82,7 @@ export default function Navigation() {
               {/* Mobile Menu Button */}
               <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="md:hidden p-2 text-secondary-700 hover:text-primary-600"
+                className="p-2 md:hidden text-secondary-700 hover:text-primary-600"
               >
                 {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
               </button>
@@ -93,14 +92,14 @@ export default function Navigation() {
 
         {/* Mobile Navigation */}
         {isOpen && (
-          <div className="md:hidden bg-white border-t">
-            <div className="container-max py-4">
+          <div className="bg-white border-t md:hidden">
+            <div className="py-4 container-max">
               <div className="flex flex-col space-y-4">
                 {navLinks.map((link) => (
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="text-secondary-700 hover:text-primary-600 font-medium py-2"
+                    className="py-2 font-medium text-secondary-700 hover:text-primary-600"
                     onClick={() => setIsOpen(false)}
                   >
                     {link.label}

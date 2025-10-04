@@ -1,8 +1,8 @@
-// app/services/[slug]/page.tsx - GUARANTEED WORKING VERSION
+// app/services/[slug]/page.tsx - INDIVIDUAL SERVICE PAGE
+import { notFound } from 'next/navigation'
 import { Metadata } from 'next'
 import ServiceDetails from '@/components/ServiceDetails'
 import { getServiceBySlug, getServices } from '@/lib/cosmic'
-import { Service } from '@/types'
 
 export async function generateMetadata({ 
   params 
@@ -10,8 +10,6 @@ export async function generateMetadata({
   params: Promise<{ slug: string }> 
 }): Promise<Metadata> {
   const { slug } = await params
-  
-  // Always get a service (will use demo data if not found)
   const service = await getServiceBySlug(slug)
 
   const title = `${service.title} - RFP.AUCTION`
@@ -20,39 +18,17 @@ export async function generateMetadata({
   return {
     title,
     description,
-    openGraph: {
-      title,
-      description,
-      type: 'website',
-    },
   }
 }
 
 export async function generateStaticParams() {
   try {
     const services = await getServices()
-    
-    // If no services in Cosmic, use demo slugs
-    if (services.length === 0) {
-      console.log('📋 No services in Cosmic, using demo slugs for static generation')
-      return [
-        { slug: 'rfp-response-writing-service' },
-        { slug: 'rfp-consultation' },
-        { slug: 'proposal-development' }
-      ]
-    }
-    
     return services.map((service) => ({
       slug: service.slug,
     }))
-    
   } catch (error) {
-    console.error('❌ Error generating static paths, using demo slugs:', error)
-    return [
-      { slug: 'rfp-response-writing-service' },
-      { slug: 'rfp-consultation' },
-      { slug: 'proposal-development' }
-    ]
+    return []
   }
 }
 
@@ -62,12 +38,11 @@ export default async function ServiceDetailPage({
   params: Promise<{ slug: string }> 
 }) {
   const { slug } = await params
-  console.log('🎯 Loading service page for slug:', slug)
-  
-  // This will NEVER return null because of the demo fallback
   const service = await getServiceBySlug(slug)
   
-  console.log('✅ Service loaded:', service.title)
-  
+  if (!service) {
+    notFound()
+  }
+
   return <ServiceDetails service={service} />
 }
