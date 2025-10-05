@@ -2,6 +2,11 @@
   "installCommand": "pnpm install",
   "buildCommand": "pnpm run build",
   "outputDirectory": ".next",
+  "env": {
+    "COSMIC_BUCKET_SLUG": "@cosmic_bucket_slug",
+    "COSMIC_READ_KEY": "@cosmic_read_key",
+    "COSMIC_WRITE_KEY": "@cosmic_write_key"
+  },
   "functions": {
     "app/api/**/*.ts": {
       "maxDuration": 30
