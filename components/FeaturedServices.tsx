@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { safeFeatures } from "@/lib/safeFeatures";
 import { Service } from "@/types";
 import { ArrowRight, Clock, Zap, FileText, TrendingUp } from "lucide-react";
 
@@ -7,9 +6,24 @@ interface FeaturedServicesProps {
   services?: Service[];
 }
 
-/* ---------------------------------------------------
-   🧱 Manual Default Data (No External Calls)
---------------------------------------------------- */
+/* ---------------------------------------------
+   Safe utility — never throws even on bad data
+---------------------------------------------- */
+function safeArray(value: any): string[] {
+  if (Array.isArray(value)) {
+    return value.filter(
+      (x: unknown): x is string => typeof x === "string" && x.trim() !== ""
+    );
+  }
+  if (typeof value === "string" && value.trim() !== "") {
+    return value.split(",").map((s: string) => s.trim());
+  }
+  return [];
+}
+
+/* ---------------------------------------------
+   Default fallback data for local dev / preview
+---------------------------------------------- */
 const defaultServices: Service[] = [
   {
     id: "1",
@@ -92,39 +106,34 @@ const defaultServices: Service[] = [
   },
 ];
 
-/* ---------------------------------------------------
-   🧩 FeaturedServices Component
---------------------------------------------------- */
 export default function FeaturedServices({ services = [] }: FeaturedServicesProps) {
-  const displayServices: Service[] =
-    Array.isArray(services) && services.length > 0
-      ? services.map((s) => ({
-          ...s,
-          metadata: {
-            ...s.metadata,
-            features: safeFeatures(s.metadata?.features),
-          },
-        }))
-      : defaultServices;
+  const displayServices = Array.isArray(services) && services.length > 0
+    ? services
+    : defaultServices;
 
   return (
     <section className="section-padding bg-gradient-to-br from-blue-50 to-indigo-100">
       <div className="container-max">
         <div className="mb-16 text-center">
-          <h2 className="mb-4 text-4xl font-bold text-gray-900">Featured RFP Services</h2>
+          <h2 className="mb-4 text-4xl font-bold text-gray-900">
+            Featured RFP Services
+          </h2>
           <p className="max-w-2xl mx-auto text-lg text-gray-600">
-            Our most popular RFP solutions trusted by businesses to save time, reduce costs, and win
-            more contracts with blockchain-verified quality.
+            Our most popular RFP solutions trusted by businesses to save time,
+            reduce costs, and win more contracts with blockchain-verified quality.
           </p>
         </div>
 
+        {/* Grid */}
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           {displayServices.map((service, index) => {
-            const features = safeFeatures(service.metadata?.features);
             const imageUrl =
               service.metadata?.featured_image?.imgix_url ||
               service.metadata?.featured_image?.url ||
               "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop&auto=format,compress";
+
+            // ✅ Safe guard: convert features to an array
+            const features = safeArray(service.metadata?.features);
 
             return (
               <div
@@ -156,12 +165,13 @@ export default function FeaturedServices({ services = [] }: FeaturedServicesProp
                       {service.title}
                     </h3>
                     <p className="leading-relaxed text-gray-600 line-clamp-2">
-                      {service.metadata?.description || "Professional RFP service solution"}
+                      {service.metadata?.description ||
+                        "Professional RFP service solution"}
                     </p>
                   </div>
 
                   {/* ✅ SAFE FEATURES */}
-                  {features.length > 0 && (
+                  {features.length > 0 ? (
                     <div className="mb-4 space-y-2">
                       {features.slice(0, 3).map((feature, i) => (
                         <div key={i} className="flex items-center gap-2 text-sm text-gray-600">
@@ -175,6 +185,10 @@ export default function FeaturedServices({ services = [] }: FeaturedServicesProp
                           <span>+{features.length - 3} more features</span>
                         </div>
                       )}
+                    </div>
+                  ) : (
+                    <div className="mb-4 text-sm italic text-gray-400">
+                      No listed features
                     </div>
                   )}
 
@@ -192,7 +206,9 @@ export default function FeaturedServices({ services = [] }: FeaturedServicesProp
                           ${service.metadata.price.toFixed(0)}
                         </div>
                       )}
-                      <div className="text-sm text-gray-500">One-time payment • No hidden fees</div>
+                      <div className="text-sm text-gray-500">
+                        One-time payment • No hidden fees
+                      </div>
                     </div>
 
                     <Link
@@ -219,7 +235,7 @@ export default function FeaturedServices({ services = [] }: FeaturedServicesProp
             <ArrowRight className="w-5 h-5" />
           </Link>
           <p className="mt-4 text-sm text-gray-600">
-            Join 500+ businesses using RFP.AUCTION to streamline their procurement process.
+            Join 500+ businesses using RFP.AUCTION to streamline procurement.
           </p>
         </div>
       </div>
