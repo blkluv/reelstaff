@@ -28,17 +28,31 @@ export default function ServiceDetails({ service }: ServiceDetailsProps) {
   const [isAddingToCart, setIsAddingToCart] = useState(false)
   const [selectedImage, setSelectedImage] = useState(0)
 
-  // ✅ Normalize metadata defensively to avoid build-time crashes
-const f: unknown = service.metadata?.features
-let normalizedFeatures: string[] = []
+  /* ✅ GUARANTEED NORMALIZATION */
+  const metadata = service.metadata ?? {}
+  const f: unknown = metadata.features
+  let normalizedFeatures: string[] = []
 
-if (Array.isArray(f)) {
-  normalizedFeatures = f.filter(
-    (x): x is string => typeof x === 'string' && x.trim() !== ''
-  )
-} else if (typeof f === 'string' && (f as string).trim() !== '') {
-  normalizedFeatures = (f as string).split(',').map((s: string) => s.trim())
-}
+  if (Array.isArray(f)) {
+    normalizedFeatures = f.filter(
+      (x): x is string => typeof x === 'string' && x.trim() !== ''
+    )
+  } else if (typeof f === 'string' && f.trim() !== '') {
+    normalizedFeatures = f.split(',').map((s: string) => s.trim())
+  } else {
+    normalizedFeatures = []
+  }
+
+  // ✅ Ensure metadata is never null/undefined in render
+  service.metadata = {
+    ...metadata,
+    features: normalizedFeatures,
+    description: metadata.description ?? '',
+    price: typeof metadata.price === 'number' ? metadata.price : Number(metadata.price) || 0,
+    delivery_time: metadata.delivery_time ?? 'N/A',
+    service_type: metadata.service_type ?? 'standard',
+    featured_image: metadata.featured_image ?? {},
+  }
 
   const handleAddToCart = async () => {
     setIsAddingToCart(true)
@@ -191,20 +205,23 @@ if (Array.isArray(f)) {
               )}
             </div>
 
-            {/* ✅ Features (Crash-Proof Rendering) */}
-            {normalizedFeatures.length > 0 && (
-              <div>
-                <h3 className="mb-3 text-lg font-semibold text-secondary-900">Service Features</h3>
-                <div className="space-y-2">
-                  {normalizedFeatures.map((feature, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <CheckCircle className="flex-shrink-0 w-4 h-4 text-green-600" />
-                      <span className="text-secondary-700">{feature}</span>
-                    </div>
-                  ))}
+            {/* ✅ Features — Now Impossible to Break */}
+            {Array.isArray(service.metadata?.features) &&
+              service.metadata.features.length > 0 && (
+                <div>
+                  <h3 className="mb-3 text-lg font-semibold text-secondary-900">
+                    Service Features
+                  </h3>
+                  <div className="space-y-2">
+                    {service.metadata.features.map((feature: string, index: number) => (
+                      <div key={index} className="flex items-center gap-2">
+                        <CheckCircle className="flex-shrink-0 w-4 h-4 text-green-600" />
+                        <span className="text-secondary-700">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
+              )}
 
             {/* Quantity / Cart */}
             <div className="space-y-4">
