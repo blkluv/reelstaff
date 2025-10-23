@@ -1,12 +1,14 @@
 import { createBucketClient } from "@cosmicjs/sdk";
 import { Service, Category } from "@/types";
-// --- GLOBAL NORMALIZER: ensures every service is clean before render ---
+
+/* -----------------------------------------------
+   GLOBAL NORMALIZER: ensures every service is clean
+------------------------------------------------ */
 function normalizeServiceMetadata(service: Service): Service {
   if (!service.metadata) service.metadata = {} as any;
-
   const m = service.metadata as any;
 
-  // normalize features
+  // Normalize features
   if (!Array.isArray(m.features)) {
     if (typeof m.features === "string" && m.features.trim() !== "") {
       m.features = m.features.split(",").map((s: string) => s.trim());
@@ -15,11 +17,11 @@ function normalizeServiceMetadata(service: Service): Service {
     }
   }
 
-  // normalize optional arrays
+  // Normalize optional arrays
   if (!Array.isArray(m.images)) m.images = [];
   if (!Array.isArray(m.gallery)) m.gallery = [];
 
-  // fallback for other expected fields
+  // Fallbacks
   if (typeof m.description !== "string") m.description = "";
   if (typeof m.delivery_time !== "string") m.delivery_time = "";
   if (typeof m.price !== "number") m.price = 0;
@@ -27,19 +29,25 @@ function normalizeServiceMetadata(service: Service): Service {
   return service;
 }
 
-// -------------------- COSMIC INIT --------------------
+/* -----------------------------------------------
+   COSMIC INIT
+------------------------------------------------ */
 export const cosmic = createBucketClient({
   bucketSlug: process.env.COSMIC_BUCKET_SLUG as string,
   readKey: process.env.COSMIC_READ_KEY as string,
   writeKey: process.env.COSMIC_WRITE_KEY as string,
 });
 
-// -------------------- HELPER --------------------
+/* -----------------------------------------------
+   HELPERS
+------------------------------------------------ */
 function hasStatus(error: unknown): error is { status: number } {
   return typeof error === "object" && error !== null && "status" in error;
 }
 
-// -------------------- DEMO DATA --------------------
+/* -----------------------------------------------
+   DEMO DATA (fallbacks if Cosmic fails)
+------------------------------------------------ */
 function getDemoServiceBySlug(slug: string): Service {
   const demoServices: Record<string, Service> = {
     "rfp-response-writing-service": {
@@ -127,11 +135,12 @@ function getDemoServiceBySlug(slug: string): Service {
   ) as Service;
 }
 
-// -------------------- UTILITIES --------------------
+/* -----------------------------------------------
+   UTILITIES
+------------------------------------------------ */
 export function getServiceImageUrl(service: Service): string {
   const fallback =
     "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop&auto=format";
-
   const img = service.metadata?.featured_image;
   if (!img) return fallback;
 
@@ -143,7 +152,9 @@ export function getServiceImageUrl(service: Service): string {
     : url;
 }
 
-// -------------------- GET ALL SERVICES --------------------
+/* -----------------------------------------------
+   GET ALL SERVICES
+------------------------------------------------ */
 export async function getServices(): Promise<Service[]> {
   try {
     const response = await cosmic.objects
@@ -164,33 +175,11 @@ export async function getServices(): Promise<Service[]> {
       ])
       .depth(1);
 
-    const services = response.objects || [];
+    const services: Service[] = (response.objects || []).map(normalizeServiceMetadata);
 
-    // ✅ Normalize metadata.features to always be an array
-    services.forEach((service: Service) => {
-      if (service.metadata) {
-        const f = service.metadata.features;
-
-        if (Array.isArray(f)) {
-          return;
-        }
-
-        if (typeof f === "string") {
-          const str = f as string;
-          if (str.trim() !== "") {
-            service.metadata.features = str.split(",").map((s) => s.trim());
-          } else {
-            service.metadata.features = [];
-          }
-        } else {
-          service.metadata.features = [];
-        }
-      }
-    });
-
-    // ✅ Sort newest first
-    return services.sort((a: Service, b: Service) =>
-      new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+    return services.sort(
+      (a: Service, b: Service) =>
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
     );
   } catch (error) {
     if (hasStatus(error) && error.status === 404) return [];
@@ -199,7 +188,9 @@ export async function getServices(): Promise<Service[]> {
   }
 }
 
-// -------------------- GET SINGLE SERVICE --------------------
+/* -----------------------------------------------
+   GET SINGLE SERVICE
+------------------------------------------------ */
 export async function getServiceBySlug(slug: string): Promise<Service> {
   if (!slug || typeof slug !== "string") {
     console.error("❌ Invalid slug provided to getServiceBySlug:", slug);
@@ -225,24 +216,7 @@ export async function getServiceBySlug(slug: string): Promise<Service> {
 
     if (response.object) {
       console.log("✅ Found service in Cosmic:", response.object.title);
-
-      if (response.object.metadata) {
-        const m = response.object.metadata as any;
-
-        // Normalize "features"
-        if (!Array.isArray(m.features)) {
-          if (typeof m.features === "string" && m.features.trim() !== "") {
-            m.features = [m.features];
-          } else {
-            m.features = [];
-          }
-        }
-
-        if (!Array.isArray(m.images)) m.images = [];
-        if (!Array.isArray(m.gallery)) m.gallery = [];
-      }
-
-      return response.object as Service;
+      return normalizeServiceMetadata(response.object as Service);
     }
   } catch (error) {
     if (hasStatus(error) && error.status === 404)
@@ -254,7 +228,9 @@ export async function getServiceBySlug(slug: string): Promise<Service> {
   return getDemoServiceBySlug(slug);
 }
 
-// -------------------- FEATURED --------------------
+/* -----------------------------------------------
+   FEATURED SERVICES
+------------------------------------------------ */
 export async function getFeaturedServices(): Promise<Service[]> {
   try {
     const response = await cosmic.objects
@@ -279,11 +255,7 @@ export async function getFeaturedServices(): Promise<Service[]> {
       ])
       .depth(1);
 
-    const featured = response.objects || [];
-    featured.forEach((s: Service) => {
-      const m = s.metadata as any;
-      if (!Array.isArray(m.features)) m.features = [];
-    });
+    const featured = (response.objects || []).map(normalizeServiceMetadata);
     return featured;
   } catch (error) {
     if (hasStatus(error) && error.status === 404) return [];
@@ -292,32 +264,34 @@ export async function getFeaturedServices(): Promise<Service[]> {
   }
 }
 
-// -------------------- CATEGORIES --------------------
+/* -----------------------------------------------
+   CATEGORIES
+------------------------------------------------ */
 export async function getCategories(): Promise<Category[]> {
   try {
     const services = await getServices();
-    const categoryMap = new Map();
+    const categoryMap = new Map<string, Category>();
 
     services.forEach((service: Service) => {
       const cat = service.metadata?.category;
-      if (cat) {
-        const title = typeof cat === "string" ? cat : cat.title || "";
-        const slug =
-          typeof cat === "string"
-            ? cat.toLowerCase().replace(/\s+/g, "-")
-            : cat.slug || title.toLowerCase().replace(/\s+/g, "-");
+      if (!cat) return;
 
-        if (title && slug && !categoryMap.has(slug)) {
-          categoryMap.set(slug, {
-            id: slug,
-            title,
-            slug,
-            type: "categories",
-            metadata: {},
-            created_at: new Date().toISOString(),
-            modified_at: new Date().toISOString(),
-          });
-        }
+      const title = typeof cat === "string" ? cat : cat.title || "";
+      const slug =
+        typeof cat === "string"
+          ? cat.toLowerCase().replace(/\s+/g, "-")
+          : cat.slug || title.toLowerCase().replace(/\s+/g, "-");
+
+      if (title && slug && !categoryMap.has(slug)) {
+        categoryMap.set(slug, {
+          id: slug,
+          title,
+          slug,
+          type: "categories",
+          metadata: {},
+          created_at: new Date().toISOString(),
+          modified_at: new Date().toISOString(),
+        });
       }
     });
 
@@ -328,7 +302,9 @@ export async function getCategories(): Promise<Category[]> {
   }
 }
 
-// -------------------- ALIASES & DEBUG --------------------
+/* -----------------------------------------------
+   ALIASES & DEBUG HELPERS
+------------------------------------------------ */
 export const getProducts = getServices;
 export const getActiveServices = getServices;
 
@@ -336,7 +312,6 @@ export async function getCertifications(): Promise<any[]> {
   return [];
 }
 
-// ✅ Debug helpers (used by app/debug/page.tsx)
 export async function debugCosmicData() {
   console.log("🧩 debugCosmicData(): placeholder for local debug mode");
   return [];
