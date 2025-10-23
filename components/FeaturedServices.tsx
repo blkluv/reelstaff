@@ -1,26 +1,10 @@
 import Link from "next/link";
+import { safeFeatures } from "@/lib/safeFeatures";
 import { Service } from "@/types";
-import { ArrowRight, Clock, Zap, FileText, TrendingUp, Star } from "lucide-react";
+import { ArrowRight, Clock, Zap, FileText, TrendingUp } from "lucide-react";
 
 interface FeaturedServicesProps {
   services?: Service[];
-}
-
-/* ---------------------------------------------------
-   🧩 Safe Feature Normalizer — Never Throws
---------------------------------------------------- */
-function safeFeatures(service: Partial<Service>): string[] {
-  const f = (service.metadata as any)?.features;
-
-  if (Array.isArray(f)) {
-    return f.filter((x): x is string => typeof x === "string" && x.trim() !== "");
-  }
-
-  if (typeof f === "string" && f.trim() !== "") {
-    return f.split(",").map((x: string) => x.trim());
-  }
-
-  return [];
 }
 
 /* ---------------------------------------------------
@@ -108,15 +92,17 @@ const defaultServices: Service[] = [
   },
 ];
 
+/* ---------------------------------------------------
+   🧩 FeaturedServices Component
+--------------------------------------------------- */
 export default function FeaturedServices({ services = [] }: FeaturedServicesProps) {
-  // ✅ Force default safe data
   const displayServices: Service[] =
     Array.isArray(services) && services.length > 0
       ? services.map((s) => ({
           ...s,
           metadata: {
             ...s.metadata,
-            features: safeFeatures(s),
+            features: safeFeatures(s.metadata?.features),
           },
         }))
       : defaultServices;
@@ -134,7 +120,7 @@ export default function FeaturedServices({ services = [] }: FeaturedServicesProp
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
           {displayServices.map((service, index) => {
-            const features = safeFeatures(service);
+            const features = safeFeatures(service.metadata?.features);
             const imageUrl =
               service.metadata?.featured_image?.imgix_url ||
               service.metadata?.featured_image?.url ||
@@ -174,7 +160,7 @@ export default function FeaturedServices({ services = [] }: FeaturedServicesProp
                     </p>
                   </div>
 
-                  {/* SAFE FEATURES */}
+                  {/* ✅ SAFE FEATURES */}
                   {features.length > 0 && (
                     <div className="mb-4 space-y-2">
                       {features.slice(0, 3).map((feature, i) => (
