@@ -5,7 +5,6 @@ import ServiceStandards from '@/components/ServiceStandards'
 import AboutSection from '@/components/AboutSection'
 import ContactSection from '@/components/ContactSection'
 import { getCategories, getServices } from '@/lib/cosmic'
-import { normalizeServices } from "@/lib/safeNormalize";
 
 export default async function HomePage() {
   const [categoriesResult, servicesResult] = await Promise.allSettled([
@@ -15,11 +14,23 @@ export default async function HomePage() {
 
   const categories =
     categoriesResult.status === "fulfilled" ? categoriesResult.value : [];
+  
   const servicesRaw =
     servicesResult.status === "fulfilled" ? servicesResult.value : [];
 
-  // 🚀 This guarantees metadata.features is always an array
-  const services = normalizeServices(servicesRaw);
+  // 🛠️ FIX: Safe service normalization without the missing import
+  const services = Array.isArray(servicesRaw) 
+    ? servicesRaw.map(service => ({
+        ...service,
+        metadata: {
+          ...service.metadata,
+          // Ensure features is always an array
+          features: Array.isArray(service.metadata?.features) 
+            ? service.metadata.features 
+            : []
+        }
+      }))
+    : [];
 
   return (
     <div className="min-h-screen">
