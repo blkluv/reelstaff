@@ -2,29 +2,37 @@ import { createBucketClient } from "@cosmicjs/sdk";
 import { Service, Category } from "@/types";
 
 /* -----------------------------------------------
-   GLOBAL NORMALIZER: ensures every service is clean
+   GLOBAL NORMALIZER — Ensures every service is clean
 ------------------------------------------------ */
 function normalizeServiceMetadata(service: Service): Service {
   if (!service.metadata) service.metadata = {} as any;
   const m = service.metadata as any;
 
-  // Normalize features
-  if (!Array.isArray(m.features)) {
-    if (typeof m.features === "string" && m.features.trim() !== "") {
-      m.features = m.features.split(",").map((s: string) => s.trim());
-    } else {
-      m.features = [];
-    }
+  // ✅ Normalize features (handles all cases: array, string, null, object)
+  const f = m.features;
+  if (Array.isArray(f)) {
+    m.features = f.filter(
+      (x: unknown): x is string => typeof x === "string" && x.trim() !== ""
+    );
+  } else if (typeof f === "string" && f.trim() !== "") {
+    m.features = f.split(",").map((s: string) => s.trim());
+  } else {
+    m.features = [];
   }
 
-  // Normalize optional arrays
+  // ✅ Normalize optional arrays
   if (!Array.isArray(m.images)) m.images = [];
   if (!Array.isArray(m.gallery)) m.gallery = [];
 
-  // Fallbacks
+  // ✅ Normalize text fields
   if (typeof m.description !== "string") m.description = "";
   if (typeof m.delivery_time !== "string") m.delivery_time = "";
-  if (typeof m.price !== "number") m.price = 0;
+
+  // ✅ Normalize price safely
+  if (typeof m.price !== "number") {
+    const parsed = Number(m.price);
+    m.price = isNaN(parsed) ? 0 : parsed;
+  }
 
   return service;
 }
@@ -46,7 +54,7 @@ function hasStatus(error: unknown): error is { status: number } {
 }
 
 /* -----------------------------------------------
-   DEMO DATA (fallbacks if Cosmic fails)
+   DEMO DATA (Fallbacks if Cosmic fails)
 ------------------------------------------------ */
 function getDemoServiceBySlug(slug: string): Service {
   const demoServices: Record<string, Service> = {
