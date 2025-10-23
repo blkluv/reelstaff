@@ -20,7 +20,7 @@ export default async function HomePage() {
       <HeroSection />
       <ServiceCategories categories={categoriesData} />
       <FeaturedServices services={servicesData} />
-      <ServiceStandards certifications={[]} />
+      <ServiceStandards verifications={[]} />
       <AboutSection />
       <ContactSection />
     </div>
