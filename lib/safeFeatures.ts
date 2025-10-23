@@ -1,14 +1,19 @@
-// lib/safeFeatures.ts
-export function safeFeatures(features: unknown): string[] {
+import { Service } from "@/types";
+
+/**
+ * Always returns a string[] for service metadata.features
+ */
+export function safeFeatures(service: Partial<Service>): string[] {
+  const metadata = service.metadata ?? {};
+  let features: unknown = metadata.features;
+
   if (Array.isArray(features)) {
     return features.filter(
-      (x): x is string => typeof x === 'string' && x.trim() !== ''
-    )
+      (x: unknown): x is string => typeof x === "string" && x.trim() !== ""
+    );
+  } else if (typeof features === "string" && (features as string).trim() !== "") {
+    return (features as string).split(",").map((s: string) => s.trim());
   }
 
-  if (typeof features === 'string' && features.trim() !== '') {
-    return features.split(',').map((s) => s.trim())
-  }
-
-  return []
+  return [];
 }
