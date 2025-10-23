@@ -176,20 +176,28 @@ export default function ServiceDetails({ service }: ServiceDetailsProps) {
               )}
             </div>
 
-            {/* Features */}
-            {service.metadata?.features && service.metadata.features.length > 0 && (
-              <div>
-                <h3 className="mb-3 text-lg font-semibold text-secondary-900">Service Features</h3>
-                <div className="space-y-2">
-                  {(service.metadata.features || []).map((feature, index) => (
-                    <div key={index} className="flex items-center gap-2">
-                      <CheckCircle className="flex-shrink-0 w-4 h-4 text-green-600" />
-                      <span className="text-secondary-700">{feature}</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
+{/* Features */}
+{Array.isArray(service.metadata?.features) && service.metadata.features.length > 0 ? (
+  <div>
+    <h3 className="mb-3 text-lg font-semibold text-secondary-900">Service Features</h3>
+    <div className="space-y-2">
+      {service.metadata.features.map((feature: string, index: number) => (
+        <div key={index} className="flex items-center gap-2">
+          <CheckCircle className="flex-shrink-0 w-4 h-4 text-green-600" />
+          <span className="text-secondary-700">{feature}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+) : (
+  typeof service.metadata?.features === "string" &&
+  (service.metadata.features as string).trim() !== "" && (
+    <div>
+      <h3 className="mb-3 text-lg font-semibold text-secondary-900">Service Features</h3>
+      <p className="text-secondary-700">{service.metadata.features}</p>
+    </div>
+  )
+)}
 
             {/* Quantity and Add to Cart */}
             <div className="space-y-4">
