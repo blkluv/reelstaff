@@ -1,108 +1,125 @@
 import Link from "next/link";
 import { Service } from "@/types";
-import { ArrowRight, Clock, Zap, Star, FileText, TrendingUp } from "lucide-react";
+import { ArrowRight, Clock, Zap, FileText, TrendingUp, Star } from "lucide-react";
 
 interface FeaturedServicesProps {
-  services: Service[];
+  services?: Service[];
 }
 
-// 🧩 Utility: Always return an array for features (with strict typing)
+/* ---------------------------------------------------
+   🧩 Safe Feature Normalizer — Never Throws
+--------------------------------------------------- */
 function safeFeatures(service: Partial<Service>): string[] {
   const f = (service.metadata as any)?.features;
 
-  if (Array.isArray(f)) return f as string[];
+  if (Array.isArray(f)) {
+    return f.filter((x): x is string => typeof x === "string" && x.trim() !== "");
+  }
 
-  if (typeof f === "string" && (f as string).trim() !== "") {
-    return (f as string).split(",").map((x: string) => x.trim());
+  if (typeof f === "string" && f.trim() !== "") {
+    return f.split(",").map((x: string) => x.trim());
   }
 
   return [];
 }
 
-export default function FeaturedServices({ services }: FeaturedServicesProps) {
-  const defaultServices: Service[] = [
-    {
-      id: "1",
-      slug: "rfp-response-writing-service",
-      title: "RFP Response Writing Service",
-      type: "rfp-services",
-      created_at: new Date().toISOString(),
-      modified_at: new Date().toISOString(),
-      metadata: {
-        description:
-          "End-to-end RFP response creation. We draft compliant, persuasive proposals that win contracts.",
-        price: 3500,
-        delivery_time: "7 Days",
-        service_type: "emergency",
-        features: [
-          "Guaranteed 24-hour delivery",
-          "Expert RFP writing",
-          "Priority support",
-          "Unlimited revisions",
-        ],
-        featured_image: {
-          url: "https://imgix.cosmicjs.com/e9a89940-a06f-11f0-8c2f-71055d67fae4-wizard-of-hahz-rfp-ai-services.png",
-          imgix_url:
-            "https://imgix.cosmicjs.com/e9a89940-a06f-11f0-8c2f-71055d67fae4-wizard-of-hahz-rfp-ai-services.png",
-        },
-        featured: true,
+/* ---------------------------------------------------
+   🧱 Manual Default Data (No External Calls)
+--------------------------------------------------- */
+const defaultServices: Service[] = [
+  {
+    id: "1",
+    slug: "rfp-response-writing-service",
+    title: "RFP Response Writing Service",
+    type: "rfp-services",
+    created_at: new Date().toISOString(),
+    modified_at: new Date().toISOString(),
+    metadata: {
+      description:
+        "End-to-end RFP response creation. We draft compliant, persuasive proposals that win contracts.",
+      price: 3500,
+      delivery_time: "7 Days",
+      service_type: "emergency",
+      features: [
+        "Guaranteed 24-hour delivery",
+        "Expert RFP writing",
+        "Priority support",
+        "Unlimited revisions",
+      ],
+      featured_image: {
+        url: "https://imgix.cosmicjs.com/e9a89940-a06f-11f0-8c2f-71055d67fae4-wizard-of-hahz-rfp-ai-services.png",
+        imgix_url:
+          "https://imgix.cosmicjs.com/e9a89940-a06f-11f0-8c2f-71055d67fae4-wizard-of-hahz-rfp-ai-services.png",
       },
+      featured: true,
     },
-    {
-      id: "2",
-      slug: "government-rfp-template-pack",
-      title: "Government RFP Template Service",
-      type: "rfp-services",
-      created_at: new Date().toISOString(),
-      modified_at: new Date().toISOString(),
-      metadata: {
-        description:
-          "Our Government RFP Template Pack gives you everything you need to create air-tight government proposals that actually get approved.",
-        price: 200,
-        delivery_time: "24 Hours",
-        service_type: "template",
-        features: [
-          "Federal RFP Master Template",
-          "State & Local Government Templates",
-          "Compliance Checklists",
-          "Ready to use",
-        ],
-        featured_image: {
-          url: "https://images.unsplash.com/photo-1589652717521-10c0d092dea9",
-          imgix_url: "https://images.unsplash.com/photo-1589652717521-10c0d092dea9",
-        },
-        featured: true,
+  },
+  {
+    id: "2",
+    slug: "government-rfp-template-pack",
+    title: "Government RFP Template Service",
+    type: "rfp-services",
+    created_at: new Date().toISOString(),
+    modified_at: new Date().toISOString(),
+    metadata: {
+      description:
+        "Our Government RFP Template Pack gives you everything you need to create airtight government proposals that actually get approved.",
+      price: 200,
+      delivery_time: "24 Hours",
+      service_type: "template",
+      features: [
+        "Federal RFP Master Template",
+        "State & Local Government Templates",
+        "Compliance Checklists",
+        "Ready to use",
+      ],
+      featured_image: {
+        url: "https://images.unsplash.com/photo-1589652717521-10c0d092dea9",
+        imgix_url: "https://images.unsplash.com/photo-1589652717521-10c0d092dea9",
       },
+      featured: true,
     },
-    {
-      id: "3",
-      slug: "rapid-rfp-proposal-review",
-      title: "Rapid RFP Proposal Review",
-      type: "rfp-services",
-      created_at: new Date().toISOString(),
-      modified_at: new Date().toISOString(),
-      metadata: {
-        description:
-          "Fast compliance and quality review of your draft proposal. We check alignment with RFP requirements, scoring rubrics, and provide actionable edits to strengthen your submission.",
-        price: 600,
-        delivery_time: "24 Hours",
-        service_type: "consulting",
-        features: [
-          "Comprehensive Compliance & Alignment Audit",
-          "Strategic Enhancement",
-          "Actionable Feedback",
-          "Rapid Service Execution",
-        ],
-        featured_image: {
-          url: "https://images.unsplash.com/photo-1677442136019-21780ecad995",
-          imgix_url: "https://images.unsplash.com/photo-1677442136019-21780ecad995",
-        },
-        featured: true,
+  },
+  {
+    id: "3",
+    slug: "rapid-rfp-proposal-review",
+    title: "Rapid RFP Proposal Review",
+    type: "rfp-services",
+    created_at: new Date().toISOString(),
+    modified_at: new Date().toISOString(),
+    metadata: {
+      description:
+        "Fast compliance and quality review of your draft proposal. We check alignment with RFP requirements and provide actionable edits.",
+      price: 600,
+      delivery_time: "24 Hours",
+      service_type: "consulting",
+      features: [
+        "Comprehensive Compliance Review",
+        "Strategic Enhancement",
+        "Actionable Feedback",
+        "Rapid Service Execution",
+      ],
+      featured_image: {
+        url: "https://images.unsplash.com/photo-1677442136019-21780ecad995",
+        imgix_url: "https://images.unsplash.com/photo-1677442136019-21780ecad995",
       },
+      featured: true,
     },
-  ];
+  },
+];
 
-  const displayServices: Service[] = services && services.length > 0 ? services : defaultServices;
+export default function FeaturedServices({ services = [] }: FeaturedServicesProps) {
+  // ✅ Force default safe data
+  const displayServices: Service[] =
+    Array.isArray(services) && services.length > 0
+      ? services.map((s) => ({
+          ...s,
+          metadata: {
+            ...s.metadata,
+            features: safeFeatures(s),
+          },
+        }))
+      : defaultServices;
 
   return (
     <section className="section-padding bg-gradient-to-br from-blue-50 to-indigo-100">
@@ -110,18 +127,18 @@ export default function FeaturedServices({ services }: FeaturedServicesProps) {
         <div className="mb-16 text-center">
           <h2 className="mb-4 text-4xl font-bold text-gray-900">Featured RFP Services</h2>
           <p className="max-w-2xl mx-auto text-lg text-gray-600">
-            Our most popular RFP solutions trusted by businesses to save time, reduce costs, and win more
-            contracts with blockchain-verified quality.
+            Our most popular RFP solutions trusted by businesses to save time, reduce costs, and win
+            more contracts with blockchain-verified quality.
           </p>
         </div>
 
         <div className="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
-          {displayServices.slice(0, 6).map((service, index) => {
+          {displayServices.map((service, index) => {
+            const features = safeFeatures(service);
             const imageUrl =
               service.metadata?.featured_image?.imgix_url ||
+              service.metadata?.featured_image?.url ||
               "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=400&fit=crop&auto=format,compress";
-
-            const features = safeFeatures(service);
 
             return (
               <div
@@ -157,11 +174,11 @@ export default function FeaturedServices({ services }: FeaturedServicesProps) {
                     </p>
                   </div>
 
-                  {/* ✅ SAFE FEATURES */}
+                  {/* SAFE FEATURES */}
                   {features.length > 0 && (
                     <div className="mb-4 space-y-2">
-                      {features.slice(0, 3).map((feature: string, featureIndex: number) => (
-                        <div key={featureIndex} className="flex items-center gap-2 text-sm text-gray-600">
+                      {features.slice(0, 3).map((feature, i) => (
+                        <div key={i} className="flex items-center gap-2 text-sm text-gray-600">
                           <Zap className="flex-shrink-0 w-3 h-3 text-blue-500" />
                           <span className="line-clamp-1">{feature}</span>
                         </div>
@@ -184,7 +201,7 @@ export default function FeaturedServices({ services }: FeaturedServicesProps) {
                   {/* Price + CTA */}
                   <div className="flex items-center justify-between">
                     <div>
-                      {service.metadata?.price && (
+                      {typeof service.metadata?.price === "number" && (
                         <div className="text-2xl font-bold text-blue-600">
                           ${service.metadata.price.toFixed(0)}
                         </div>
@@ -216,7 +233,7 @@ export default function FeaturedServices({ services }: FeaturedServicesProps) {
             <ArrowRight className="w-5 h-5" />
           </Link>
           <p className="mt-4 text-sm text-gray-600">
-            Join 500+ businesses using RFP.AUCTION to streamline their procurement process
+            Join 500+ businesses using RFP.AUCTION to streamline their procurement process.
           </p>
         </div>
       </div>
