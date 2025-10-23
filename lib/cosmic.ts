@@ -267,6 +267,23 @@ export async function getServiceBySlug(slug: string): Promise<Service> {
     
     if (response.object) {
       console.log('✅ Found service in Cosmic:', response.object.title)
+      if (response.object?.metadata) {
+  const m = response.object.metadata as any;
+
+  // ✅ Ensure features is always an array
+  if (!Array.isArray(m.features)) {
+    if (typeof m.features === "string" && m.features.trim() !== "") {
+      m.features = [m.features];
+    } else {
+      m.features = [];
+    }
+  }
+
+  // ✅ Normalize other potential repeatable fields for safety
+  if (!Array.isArray(m.images)) m.images = [];
+  if (!Array.isArray(m.gallery)) m.gallery = [];
+}
+
       return response.object as Service;
     }
     
